@@ -242,15 +242,26 @@ public class Pendu extends Application {
     }
 
     public void modeAccueil(){
-        this.panelCentral=this.fenetreAccueil();
+        // Si une partie est en cours, demander confirmation avant de quitter
+        if (this.modelePendu.partieEnCours()) {
+            Alert alert = this.popUpPartieEnCours();
+            alert.showAndWait();
+            if (alert.getResult() != ButtonType.YES) {
+                // L'utilisateur a annulé, on ne quitte pas la partie
+                return;
+            }
+        }
+        this.panelCentral = this.fenetreAccueil();
         this.fenetrePrincipale.setCenter(this.panelCentral);
+        // Désactive le bouton maison dans le menu accueil
+        this.boutonMaison.setDisable(true);
     }
-    
+
     public void modeJeu(){
-   
         this.panelCentral = this.fenetreJeu();
         this.fenetrePrincipale.setCenter(this.panelCentral);
-        
+        // Réactive le bouton maison quand on est en jeu
+        this.boutonMaison.setDisable(false);
     }
     
     public void modeParametres(){
