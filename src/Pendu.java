@@ -194,6 +194,7 @@ public class Pendu extends Application {
          TitledPane chrono = this.leChrono();
          Button nvmot = new Button("Nouveau mot");
          nvmot.setStyle("-fx-font-size: 18px; -fx-padding: 10 20 10 20;");
+         nvmot.setOnAction(e -> this.nouveauMotInstantane());
          aDroite.setSpacing(20);
          
          // On retire labelTemps ici
@@ -429,6 +430,33 @@ public class Pendu extends Application {
             } else if (choix.equals("Expert")) {
                 niveau = MotMystere.EXPERT;
             }
+        }
+        this.modelePendu.setNiveau(niveau);
+        this.modelePendu.setMotATrouver();
+        this.chrono.resetTime();
+        this.modeJeu();
+        this.majAffichage();
+    }
+
+    // Relance une partie instantanément avec les mêmes paramètres
+    public void nouveauMotInstantane() {
+        int niveau = this.modelePendu.getNiveau();
+        int nbErreursMax = this.modelePendu.getNbErreursMax();
+        // Si longueur aléatoire, on relance un mot aléatoire de la même façon
+        if (this.longueurAleatoire) {
+            Dictionnaire dico = new Dictionnaire(this.dictFileParam, this.longMinParam, this.longMaxParam);
+            List<Integer> longueurs = dico.getLongueurs();
+            if (longueurs.isEmpty()) {
+                this.popUpErreurDictionnaire("Aucun mot valide n'a été trouvé dans le dictionnaire sélectionné.").showAndWait();
+                this.modeAccueil();
+                return;
+            }
+            int idx = (int)(Math.random() * longueurs.size());
+            int longueur = longueurs.get(idx);
+            this.modelePendu = new MotMystere(this.dictFileParam, longueur, longueur, niveau, nbErreursMax);
+        } else {
+            // Sinon, on relance avec la longueur fixe
+            this.modelePendu = new MotMystere(this.dictFileParam, this.longueurMotsParam, this.longueurMotsParam, niveau, nbErreursMax);
         }
         this.modelePendu.setNiveau(niveau);
         this.modelePendu.setMotATrouver();
