@@ -105,17 +105,25 @@ public class Pendu extends Application {
      */
     private Pane titre(){
         BorderPane borderPane = new BorderPane();
-        borderPane.setStyle("-fx-background-color:#B784A7; -fx-padding: 10px;");
+        // Utiliser la couleur du header personnalisée
+        String couleurHeader = this.headerColorHex != null ? this.headerColorHex : "#B784A7";
+        // Calcul de la couleur de texte adaptée
+        int r = Integer.valueOf(couleurHeader.substring(1, 3), 16);
+        int g = Integer.valueOf(couleurHeader.substring(3, 5), 16);
+        int b = Integer.valueOf(couleurHeader.substring(5, 7), 16);
+        double luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+        String textColor = (luminance < 0.5) ? "white" : "#222";
+        borderPane.setStyle("-fx-background-color:" + couleurHeader + "; -fx-padding: 10px;");
 
         Label jeu = new Label("Jeu du Pendu");
-        jeu.setStyle("-fx-font-size: 32px; -fx-font-weight: bold; -fx-text-fill: #222;");
+        jeu.setStyle("-fx-font-size: 32px; -fx-font-weight: bold; -fx-text-fill: " + textColor + ";");
         borderPane.setLeft(jeu);
 
         // (Ré)initialisation des boutons pour éviter les problèmes d'affichage
         // Boutons à droite
         this.boutonMaison = new Button();
         this.boutonMaison.setGraphic(new ImageView(new Image("file:img/home.png", 32, 32, true, true)));
-        this.boutonMaison.setStyle("-fx-background-color: white; -fx-border-radius: 5; -fx-background-radius: 5;");
+        this.boutonMaison.setStyle("-fx-background-color: white; -fx-border-radius: 5; -fx-background-radius: 5; -fx-text-fill: #222;");
         this.boutonMaison.setOnAction(e -> {
             // Correction : ne demander la confirmation qu'une seule fois
             if (this.modelePendu.partieEnCours()) {
@@ -132,8 +140,7 @@ public class Pendu extends Application {
 
         this.boutonParametres = new Button();
         this.boutonParametres.setGraphic(new ImageView(new Image("file:img/parametres.png", 32, 32, true, true)));
-        this.boutonParametres.setStyle("-fx-background-color: white; -fx-border-radius: 5; -fx-background-radius: 5;");
-        // TODO: Ajouter un vrai controleur pour les paramètres si besoin
+        this.boutonParametres.setStyle("-fx-background-color: white; -fx-border-radius: 5; -fx-background-radius: 5; -fx-text-fill: #222;");
         this.boutonParametres.setOnAction(e -> this.modeParametres());
 
         Button info = new Button();
@@ -142,7 +149,7 @@ public class Pendu extends Application {
         infoView.setFitHeight(32);
         infoView.setFitWidth(32);
         info.setGraphic(infoView);
-        info.setStyle("-fx-background-color: white; -fx-border-radius: 5; -fx-background-radius: 5;");
+        info.setStyle("-fx-background-color: white; -fx-border-radius: 5; -fx-background-radius: 5; -fx-text-fill: #222;");
         info.setOnAction(new ControleurInfos(this));
 
         HBox boutons = new HBox(10, this.boutonMaison, this.boutonParametres, info);
@@ -291,9 +298,8 @@ public class Pendu extends Application {
     
     // Affiche la fenêtre des paramètres
     public void modeParametres() {
-        // Création des contrôles pour les paramètres
         VBox root = new VBox(20);
-        root.setStyle("-fx-padding: 30; -fx-background-color: #f5f5f5;");
+        root.setStyle("-fx-padding: 30;");
 
         Label titre = new Label("Paramètres du jeu");
         titre.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
@@ -301,7 +307,21 @@ public class Pendu extends Application {
         // Choix de la couleur principale
         Label couleurLabel = new Label("Couleur principale :");
         ColorPicker colorPicker = new ColorPicker();
-        colorPicker.setValue(javafx.scene.paint.Color.web("#B784A7"));
+        // Initialiser le ColorPicker avec la couleur actuellement sélectionnée
+        try {
+            colorPicker.setValue(javafx.scene.paint.Color.web(this.mainColorHex));
+        } catch (Exception ex) {
+            colorPicker.setValue(javafx.scene.paint.Color.web("#B784A7"));
+        }
+
+        // Choix de la couleur du header (barre du haut)
+        Label headerColorLabel = new Label("Couleur du top (barre du haut) :");
+        ColorPicker headerColorPicker = new ColorPicker();
+        try {
+            headerColorPicker.setValue(javafx.scene.paint.Color.web(this.headerColorHex));
+        } catch (Exception ex) {
+            headerColorPicker.setValue(javafx.scene.paint.Color.web("#B784A7"));
+        }
 
         // Choix de la longueur des mots
         Label longueurMotsLabel = new Label("Longueur des mots (nombre de lettres) :");
@@ -332,14 +352,18 @@ public class Pendu extends Application {
         Button valider = new Button("Valider");
         valider.setStyle("-fx-background-color: #B784A7; -fx-text-fill: white; -fx-font-weight: bold;");
         valider.setOnAction(e -> {
+            // Récupérer la couleur choisie
             String couleur = colorPicker.getValue().toString().replace("0x", "#").substring(0, 7);
+            this.setMainColor(couleur); // Appliquer la couleur immédiatement
+            // Récupérer la couleur du header
+            String headerCouleur = headerColorPicker.getValue().toString().replace("0x", "#").substring(0, 7);
+            this.setHeaderColor(headerCouleur); // Appliquer la couleur du header
             boolean aleatoire = aleatoireCheck.isSelected();
             int longueurMots = longueurMotsSpinner.getValue();
             String dictFile = dictCombo.getValue();
             int longMin = 3;
             int longMax = 12;
             if (aleatoire) {
-                // Calculer min/max à partir des mots du dictionnaire
                 Dictionnaire dico = new Dictionnaire(dictFile, 3, 100);
                 List<Integer> longueurs = dico.getLongueurs();
                 int min = 100, max = 3;
@@ -349,9 +373,8 @@ public class Pendu extends Application {
                 }
                 longMin = (longueurs.isEmpty() ? 3 : min);
                 longMax = (longueurs.isEmpty() ? 12 : max);
-                longueurMots = -1; // signal pour aléatoire
+                longueurMots = -1;
             }
-            // Vérification du dictionnaire et de la longueur des mots
             int testLong = (aleatoire ? longMin : longueurMots);
             MotMystere testModele = new MotMystere(dictFile, testLong, testLong, MotMystere.FACILE, 10);
             int nbMotsDispo = testModele.getNombreMotsDictionnaire();
@@ -359,8 +382,6 @@ public class Pendu extends Application {
                 this.popUpErreurDictionnaire("Aucun mot de " + (aleatoire ? (longMin + " à " + longMax) : longueurMots) + " lettres n'a été trouvé dans le dictionnaire sélectionné.\nVeuillez choisir un autre fichier ou changer la longueur des mots.").showAndWait();
                 return;
             }
-            this.fenetrePrincipale.setStyle("-fx-background-color:" + couleur + ";");
-            // Stocker l'info aléatoire dans une variable d'instance
             this.longueurAleatoire = aleatoire;
             this.longueurMotsParam = longueurMots;
             this.dictFileParam = dictFile;
@@ -370,11 +391,61 @@ public class Pendu extends Application {
             this.setMainFont(policeCombo.getValue());
             this.modeAccueil();
         });
-
-        root.getChildren().addAll(titre, couleurLabel, colorPicker, longueurMotsLabel, longueurMotsSpinner, aleatoireCheck, dictLabel, dictCombo, policeLabel, policeCombo, valider);
+        // --- Bouton pour lancer le démineur ---
+        Button demineurBtn = new Button("Partir sur Démineur");
+        demineurBtn.setStyle("-fx-background-color: #A7B7E7; -fx-text-fill: #222; -fx-font-weight: bold; font-size: 18px; -fx-padding: 10 20 10 20; border-radius: 8px;");
+        demineurBtn.setOnAction(e -> {
+            // Ferme la fenêtre du pendu
+            Stage stage = (Stage) this.fenetrePrincipale.getScene().getWindow();
+            stage.close();
+            // Lance le démineur FX dans un nouveau process avec JavaFX
+            try {
+                String javaHome = System.getProperty("java.home");
+                String javaBin = javaHome + java.io.File.separator + "bin" + java.io.File.separator + "java";
+                String classpath = System.getProperty("java.class.path");
+                String mainClass = "DemineurFX";
+                java.util.List<String> command = new java.util.ArrayList<>();
+                command.add(javaBin);
+                command.add("-cp");
+                command.add(classpath);
+                // Ajout automatique du module-path si détecté (pour Windows/VSCode)
+                String fxPath = System.getProperty("javafx.module.path");
+                if (fxPath == null) {
+                    String[] args = java.lang.management.ManagementFactory.getRuntimeMXBean().getInputArguments().toArray(new String[0]);
+                    for (String arg : args) {
+                        if (arg.startsWith("--module-path")) {
+                            command.add(arg);
+                        } else if (arg.startsWith("--add-modules")) {
+                            command.add(arg);
+                        }
+                    }
+                } else {
+                    command.add("--module-path");
+                    command.add(fxPath);
+                    command.add("--add-modules");
+                    command.add("javafx.controls,javafx.fxml");
+                }
+                command.add(mainClass);
+                new ProcessBuilder(command).start();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        });
+        // Ajout du bouton démineur uniquement
+        root.getChildren().addAll(titre, couleurLabel, colorPicker, headerColorLabel, headerColorPicker, longueurMotsLabel, longueurMotsSpinner, aleatoireCheck, dictLabel, dictCombo, policeLabel, policeCombo, valider, demineurBtn);
         this.panelCentral = new BorderPane(root);
         this.fenetrePrincipale.setCenter(this.panelCentral);
         reappliquerMainFont();
+    }
+
+    // Permet d'appliquer la couleur du header (barre du haut)
+    public void setHeaderColor(String couleurHex) {
+        this.headerColorHex = couleurHex;
+        // Rafraîchir le header si déjà affiché
+        if (this.fenetrePrincipale != null) {
+            this.fenetrePrincipale.setTop(this.titre());
+            reappliquerMainFont();
+        }
     }
 
     // Affiche une popup d'erreur si le dictionnaire est vide ou invalide
@@ -494,7 +565,9 @@ public class Pendu extends Application {
         if (!this.modelePendu.partieEnCours()) {
             this.chrono.stop();
             if (this.modelePendu.gagne()){
-                this.popUpMessageGagne().showAndWait();
+                Alert alert = this.popUpMessageGagne();
+                alert.showAndWait();
+                // Revenir à l'accueil après la victoire (ne pas fermer la fenêtre)
                 this.modeAccueil();
             } else if (this.modelePendu.perdu()){
                 this.popUpMessagePerdu().showAndWait();
@@ -575,46 +648,107 @@ public void retourAccueil() {
 }
 
 // Permet au contrôleur d'appliquer la couleur principale à la fenêtre principale
-    public void setMainColor(String couleurHex) {
-        this.fenetrePrincipale.setStyle("-fx-background-color:" + couleurHex + ";");
+public void setMainColor(String couleurHex) {
+    this.mainColorHex = couleurHex;
+    // Déterminer si la couleur est sombre
+    int r = Integer.valueOf(couleurHex.substring(1, 3), 16);
+    int g = Integer.valueOf(couleurHex.substring(3, 5), 16);
+    int b = Integer.valueOf(couleurHex.substring(5, 7), 16);
+    double luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+    String textColor = (luminance < 0.5) ? "white" : "#222";
+    // Appliquer la couleur ET la police si définie, et la couleur du texte
+    String style = "-fx-background-color:" + couleurHex + ";-fx-text-fill:" + textColor + ";";
+    if (this.mainFontFamily != null) {
+        style += "-fx-font-family: '" + this.mainFontFamily + "';";
     }
+    this.fenetrePrincipale.setStyle(style);
+}
 
 // Permet d'appliquer la police d'écriture principale sur les labels importants
-    public void setMainFont(String fontFamily) {
-        // Appliquer la police sur le titre
-        if (this.fenetrePrincipale.getTop() instanceof Pane) {
-            Pane topPane = (Pane) this.fenetrePrincipale.getTop();
-            for (javafx.scene.Node node : topPane.getChildrenUnmodifiable()) {
-                if (node instanceof Label) {
-                    ((Label) node).setStyle("-fx-font-size: 32px; -fx-font-weight: bold; -fx-text-fill: #222; -fx-font-family: '" + fontFamily + "';");
-                }
+public void setMainFont(String fontFamily) {
+    // Calcul de la couleur de texte selon la couleur de fond
+    String textColor = "#222";
+    if (this.mainColorHex != null) {
+        int r = Integer.valueOf(this.mainColorHex.substring(1, 3), 16);
+        int g = Integer.valueOf(this.mainColorHex.substring(3, 5), 16);
+        int b = Integer.valueOf(this.mainColorHex.substring(5, 7), 16);
+        double luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+        textColor = (luminance < 0.5) ? "white" : "#222";
+    }
+    // Appliquer la police et la couleur sur le titre
+    if (this.fenetrePrincipale.getTop() instanceof Pane) {
+        Pane topPane = (Pane) this.fenetrePrincipale.getTop();
+        for (javafx.scene.Node node : topPane.getChildrenUnmodifiable()) {
+            if (node instanceof Label) {
+                ((Label) node).setStyle("-fx-font-size: 32px; -fx-font-weight: bold; -fx-text-fill: " + textColor + "; -fx-font-family: '" + fontFamily + "';");
             }
         }
-        // Appliquer la police sur le mot crypté
-        if (this.motCrypte != null) {
-            this.motCrypte.setStyle("-fx-font-size: 24px; -fx-font-family: '" + fontFamily + "';");
-        }
-        // SUPPRIMÉ : plus de label leNiveau à styliser
-        // if (this.leNiveau != null) {
-        //     this.leNiveau.setStyle("-fx-font-size: 18px; -fx-font-family: '" + fontFamily + "';");
-        // }
-        // Appliquer la police sur le label du temps
-        // if (this.labelTemps != null) {
-        //     this.labelTemps.setStyle("-fx-font-size: 16px; -fx-font-family: '" + fontFamily + "';");
-        // }
-        // Stocker la police pour la réappliquer lors des changements d'écran
-        this.mainFontFamily = fontFamily;
     }
+    // Appliquer la police et la couleur sur le mot crypté
+    if (this.motCrypte != null) {
+        this.motCrypte.setStyle("-fx-font-size: 24px; -fx-font-family: '" + fontFamily + "'; -fx-fill: " + textColor + ";");
+    }
+    // Appliquer la police et la couleur sur tous les boutons visibles
+    applyTextColorToButtons(this.panelCentral, textColor, fontFamily);
+    // Appliquer la police ET la couleur sur tout le contenu de la fenêtre principale
+    String style = "";
+    if (this.mainColorHex != null) {
+        style += "-fx-background-color:" + this.mainColorHex + ";";
+    }
+    style += "-fx-font-family: '" + fontFamily + "';";
+    this.fenetrePrincipale.setStyle(style);
+    // Stocker la police pour la réappliquer lors des changements d'écran
+    this.mainFontFamily = fontFamily;
+}
 
-    // À appeler après chaque changement d'écran pour réappliquer la police
-    private void reappliquerMainFont() {
-        if (this.mainFontFamily != null) {
-            setMainFont(this.mainFontFamily);
+// Applique la couleur du texte et la police à tous les boutons et labels enfants d'un parent
+private void applyTextColorToButtons(Pane parent, String textColor, String fontFamily) {
+    if (parent == null) return;
+    for (javafx.scene.Node node : parent.getChildren()) {
+        if (node instanceof Button) {
+            Button btn = (Button) node;
+            // Si le fond principal est sombre, forcer les boutons à fond blanc et texte noir
+            int r = Integer.valueOf(this.mainColorHex.substring(1, 3), 16);
+            int g = Integer.valueOf(this.mainColorHex.substring(3, 5), 16);
+            int b = Integer.valueOf(this.mainColorHex.substring(5, 7), 16);
+            double luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+            boolean fondSombre = luminance < 0.5;
+            if (fondSombre) {
+                btn.setStyle("-fx-background-color: white; -fx-text-fill: #222; -fx-font-family: '" + fontFamily + "';");
+            } else {
+                // Ancien comportement :
+                String style = btn.getStyle();
+                boolean headerBtn = false;
+                if (style != null && (style.contains("background-color: white") || style.contains("background-color:#fff") || style.contains("background-color: #fff"))) {
+                    headerBtn = true;
+                }
+                if (headerBtn) {
+                    btn.setStyle(style + ";-fx-text-fill: #222; -fx-font-family: '" + fontFamily + "';");
+                } else {
+                    btn.setStyle("-fx-text-fill: " + textColor + "; -fx-font-family: '" + fontFamily + "';");
+                }
+            }
+        } else if (node instanceof Label) {
+            ((Label) node).setStyle("-fx-text-fill: " + textColor + "; -fx-font-family: '" + fontFamily + "';");
+        } else if (node instanceof Pane) {
+            applyTextColorToButtons((Pane) node, textColor, fontFamily);
         }
     }
+}
 
-    // Ajout d'un champ pour stocker la police principale
-    private String mainFontFamily = null;
+// À appeler après chaque changement d'écran pour réappliquer la police
+private void reappliquerMainFont() {
+    if (this.mainFontFamily != null) {
+        setMainFont(this.mainFontFamily);
+    }
+}
+
+// Ajout d'un champ pour stocker la couleur principale
+private String mainColorHex = "#B784A7";
+// Ajout d'un champ pour stocker la police principale
+private String mainFontFamily = null;
+// Ajout d'un champ pour stocker la couleur du header (barre du haut)
+private String headerColorHex = "#B784A7";
 
     // Chronomètre fonctionnel
     private Label chronoLabel = null; // Affichage du chrono
@@ -625,4 +759,14 @@ public void retourAccueil() {
     private String dictFileParam = "src/mots.txt";
     private int longMinParam = 3;
     private int longMaxParam = 12;
+
+    // La méthode titre() correcte existe déjà plus haut et retourne un Pane
+    // La méthode getContrastColor n'est utile qu'en version utilitaire, à placer ici :
+    private String getContrastColor(String hexColor) {
+        int r = Integer.valueOf(hexColor.substring(1, 3), 16);
+        int g = Integer.valueOf(hexColor.substring(3, 5), 16);
+        int b = Integer.valueOf(hexColor.substring(5, 7), 16);
+        double luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+        return luminance > 0.5 ? "black" : "white";
+    }
 }
