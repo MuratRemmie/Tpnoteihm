@@ -146,8 +146,8 @@ public class Pendu extends Application {
     }
 
     // /**
-     // * @return le panel du chronomètre
-     // */
+    // * @return le panel du chronomètre
+    // */
      private TitledPane leChrono(){
         // A implementer
          TitledPane res = new TitledPane();
@@ -156,9 +156,9 @@ public class Pendu extends Application {
      }
 
     // /**
-     // * @return la fenêtre de jeu avec le mot crypté, l'image, la barre
-     // *         de progression et le clavier
-     // */
+    // * @return la fenêtre de jeu avec le mot crypté, l'image, la barre
+    // *         de progression et le clavier
+    // */
      private BorderPane fenetreJeu(){
          BorderPane mid = new BorderPane();
 
@@ -197,8 +197,8 @@ public class Pendu extends Application {
      }
 
     // /**
-     // * @return la fenêtre d'accueil sur laquelle on peut choisir les paramètres de jeu
-     // */
+    // * @return la fenêtre d'accueil sur laquelle on peut choisir les paramètres de jeu
+    // */
      private BorderPane fenetreAccueil(){
         HBox head = new HBox();
         head.setStyle("-fx-background-color:#B784A7; -fx-padding: 10px;");
@@ -258,6 +258,7 @@ public class Pendu extends Application {
         this.fenetrePrincipale.setCenter(this.panelCentral);
         // Désactive le bouton maison dans le menu accueil
         this.boutonMaison.setDisable(true);
+        reappliquerMainFont();
     }
 
     public void modeJeu(){
@@ -265,11 +266,63 @@ public class Pendu extends Application {
         this.fenetrePrincipale.setCenter(this.panelCentral);
         // Réactive le bouton maison quand on est en jeu
         this.boutonMaison.setDisable(false);
+        reappliquerMainFont();
     }
     
-    public void modeParametres(){
-        // A implémenter
-        
+    // Affiche la fenêtre des paramètres
+    public void modeParametres() {
+        // Création des contrôles pour les paramètres
+        VBox root = new VBox(20);
+        root.setStyle("-fx-padding: 30; -fx-background-color: #f5f5f5;");
+
+        Label titre = new Label("Paramètres du jeu");
+        titre.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
+
+        // Choix de la couleur principale
+        Label couleurLabel = new Label("Couleur principale :");
+        ColorPicker colorPicker = new ColorPicker();
+        colorPicker.setValue(javafx.scene.paint.Color.web("#B784A7"));
+
+        // Choix du nombre de mots par difficulté
+        Label nbMotsLabel = new Label("Nombre de mots par difficulté :");
+        Spinner<Integer> nbMotsSpinner = new Spinner<>(1, 100, 10);
+
+        // Choix du dictionnaire
+        Label dictLabel = new Label("Dictionnaire :");
+        ComboBox<String> dictCombo = new ComboBox<>();
+        dictCombo.getItems().addAll("mots.txt", "autre_dico.txt");
+        dictCombo.setValue("mots.txt");
+
+        // Choix de la police d'écriture
+        Label policeLabel = new Label("Police d'écriture :");
+        ComboBox<String> policeCombo = new ComboBox<>();
+        policeCombo.getItems().addAll("Arial", "Verdana", "Comic Sans MS", "Times New Roman");
+        // Initialiser la valeur du ComboBox avec la police actuellement sélectionnée
+        if (this.mainFontFamily != null) {
+            policeCombo.setValue(this.mainFontFamily);
+        } else {
+            policeCombo.setValue("Arial");
+        }
+        // Bouton valider
+        Button valider = new Button("Valider");
+        valider.setStyle("-fx-background-color: #B784A7; -fx-text-fill: white; -fx-font-weight: bold;");
+        valider.setOnAction(e -> {
+            // Appliquer les paramètres
+            // Couleur principale
+            String couleur = colorPicker.getValue().toString().replace("0x", "#").substring(0, 7);
+            this.fenetrePrincipale.setStyle("-fx-background-color:" + couleur + ";");
+            // Nombre de mots (à stocker si besoin)
+            // Dictionnaire (à recharger si besoin)
+            // Police d'écriture (à appliquer sur les labels principaux)
+            this.setMainFont(policeCombo.getValue());
+            // Retour au menu
+            this.modeAccueil();
+        });
+
+        root.getChildren().addAll(titre, couleurLabel, colorPicker, nbMotsLabel, nbMotsSpinner, dictLabel, dictCombo, policeLabel, policeCombo, valider);
+        this.panelCentral = new BorderPane(root);
+        this.fenetrePrincipale.setCenter(this.panelCentral);
+        reappliquerMainFont();
     }
 
     /** lance une partie */
@@ -315,9 +368,6 @@ public class Pendu extends Application {
 
         // Pour afficher le temps en texte
         labelTemps.setText("Temps : " + chrono.getText());
-
-        // Pour afficher le temps en millisecondes
-        long temps = chrono.getTempsEcoule();
 
         // Afficher les popups de victoire/défaite si la partie vient de se terminer
         if (!this.modelePendu.partieEnCours()) {
@@ -401,4 +451,46 @@ public void retourAccueil() {
     this.fenetrePrincipale.setCenter(this.panelCentral);
     this.boutonMaison.setDisable(true); // grise le bouton maison dans le menu
 }
+
+// Permet au contrôleur d'appliquer la couleur principale à la fenêtre principale
+    public void setMainColor(String couleurHex) {
+        this.fenetrePrincipale.setStyle("-fx-background-color:" + couleurHex + ";");
+    }
+
+// Permet d'appliquer la police d'écriture principale sur les labels importants
+    public void setMainFont(String fontFamily) {
+        // Appliquer la police sur le titre
+        if (this.fenetrePrincipale.getTop() instanceof Pane) {
+            Pane topPane = (Pane) this.fenetrePrincipale.getTop();
+            for (javafx.scene.Node node : topPane.getChildrenUnmodifiable()) {
+                if (node instanceof Label) {
+                    ((Label) node).setStyle("-fx-font-size: 32px; -fx-font-weight: bold; -fx-text-fill: #222; -fx-font-family: '" + fontFamily + "';");
+                }
+            }
+        }
+        // Appliquer la police sur le mot crypté
+        if (this.motCrypte != null) {
+            this.motCrypte.setStyle("-fx-font-size: 24px; -fx-font-family: '" + fontFamily + "';");
+        }
+        // Appliquer la police sur le label du niveau
+        if (this.leNiveau != null) {
+            this.leNiveau.setStyle("-fx-font-size: 18px; -fx-font-family: '" + fontFamily + "';");
+        }
+        // Appliquer la police sur le label du temps
+        if (this.labelTemps != null) {
+            this.labelTemps.setStyle("-fx-font-size: 16px; -fx-font-family: '" + fontFamily + "';");
+        }
+        // Stocker la police pour la réappliquer lors des changements d'écran
+        this.mainFontFamily = fontFamily;
+    }
+
+    // À appeler après chaque changement d'écran pour réappliquer la police
+    private void reappliquerMainFont() {
+        if (this.mainFontFamily != null) {
+            setMainFont(this.mainFontFamily);
+        }
+    }
+
+    // Ajout d'un champ pour stocker la police principale
+    private String mainFontFamily = null;
 }
