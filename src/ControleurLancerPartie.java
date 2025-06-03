@@ -31,11 +31,19 @@ public class ControleurLancerPartie implements EventHandler<ActionEvent> {
      * @param actionEvent l'événement action
      */
     @Override
-   public void handle(ActionEvent actionEvent) {
-    Optional<ButtonType> reponse = this.vuePendu.popUpPartieEnCours().showAndWait();
-        if (reponse.isPresent() && reponse.get().equals(ButtonType.YES)) {
-            System.out.println("Ok ! Recommencer une partie");
+    public void handle(ActionEvent actionEvent) {
+        if (this.modelePendu.partieEnCours()) {
+            Optional<ButtonType> reponse = this.vuePendu.popUpPartieEnCours().showAndWait();
+            if (reponse.isPresent() && reponse.get().equals(ButtonType.YES)) {
+                System.out.println("Ok ! Recommencer une partie");
+                this.vuePendu.lancePartie();
+            } else {
+                System.out.println("Annulation du relancement de la partie");
+            }
+        } else {
+            System.out.println("Aucune partie en cours, lancement direct");
             this.vuePendu.lancePartie();
-   } }
+        }
+    }
 }
 

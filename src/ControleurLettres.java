@@ -38,6 +38,9 @@ public class ControleurLettres implements EventHandler<ActionEvent> {
         String lettre = bouton.getText();
         char lettreChar = lettre.charAt(0);
         this.modelePendu.essaiLettre(lettreChar);
+        // Désactive le bouton utilisé
+        bouton.setDisable(true);
+        // Met à jour l'affichage (mot, pendu, progression, clavier)
         this.vuePendu.majAffichage();
         
         if(modelePendu.gagne()){
@@ -51,7 +54,7 @@ public class ControleurLettres implements EventHandler<ActionEvent> {
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
                 alert.setTitle("Partie perdue");
                 alert.setHeaderText("Dommage !");
-                alert.setContentText("Tu as perdu, le mot était: " + modelePendu.getMotATrouve());
+                alert.setContentText("Tu as perdu, le mot était: " + modelePendu.getMotATrouver());
                 alert.showAndWait();
             }
         }
