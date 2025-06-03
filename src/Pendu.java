@@ -116,7 +116,16 @@ public class Pendu extends Application {
         this.boutonMaison = new Button();
         this.boutonMaison.setGraphic(new ImageView(new Image("file:img/home.png", 32, 32, true, true)));
         this.boutonMaison.setStyle("-fx-background-color: white; -fx-border-radius: 5; -fx-background-radius: 5;");
-        this.boutonMaison.setOnAction(new RetourAccueil(this.modelePendu, this));
+        this.boutonMaison.setOnAction(e -> {
+            if (this.modelePendu.partieEnCours()) {
+                Alert alert = this.popUpPartieEnCours();
+                alert.showAndWait();
+                if (alert.getResult() != ButtonType.YES) {
+                    return;
+                }
+            }
+            this.modeAccueil();
+        });
 
         this.boutonParametres = new Button();
         this.boutonParametres.setGraphic(new ImageView(new Image("file:img/parametres.png", 32, 32, true, true)));
@@ -259,8 +268,9 @@ public class Pendu extends Application {
         }
         this.panelCentral = this.fenetreAccueil();
         this.fenetrePrincipale.setCenter(this.panelCentral);
-        // Désactive le bouton maison dans le menu accueil
         this.boutonMaison.setDisable(true);
+        this.boutonParametres.setVisible(true);
+        this.boutonParametres.setDisable(false); // Toujours réactiver le bouton paramètres
         reappliquerMainFont();
     }
 
@@ -268,6 +278,8 @@ public class Pendu extends Application {
         this.panelCentral = this.fenetreJeu();
         this.fenetrePrincipale.setCenter(this.panelCentral);
         this.boutonMaison.setDisable(false);
+        this.boutonParametres.setDisable(true); // Désactive le bouton paramètres pendant le jeu
+        this.boutonParametres.setVisible(true); // Le bouton reste visible (grisé) pendant le jeu
         reappliquerMainFont();
         this.chrono.resetTime();
         this.chrono.start();
@@ -288,15 +300,16 @@ public class Pendu extends Application {
         ColorPicker colorPicker = new ColorPicker();
         colorPicker.setValue(javafx.scene.paint.Color.web("#B784A7"));
 
-        // Choix du nombre de mots par difficulté
-        Label nbMotsLabel = new Label("Nombre de mots par difficulté :");
-        Spinner<Integer> nbMotsSpinner = new Spinner<>(1, 100, 10);
+        // Choix de la longueur des mots
+        Label longueurMotsLabel = new Label("Longueur des mots (nombre de lettres) :");
+        Spinner<Integer> longueurMotsSpinner = new Spinner<>(3, 12, 5);
+        longueurMotsSpinner.setEditable(true);
 
         // Choix du dictionnaire
         Label dictLabel = new Label("Dictionnaire :");
         ComboBox<String> dictCombo = new ComboBox<>();
-        dictCombo.getItems().addAll("mots.txt", "autre_dico.txt");
-        dictCombo.setValue("mots.txt");
+        dictCombo.getItems().addAll("src/mots.txt", "src/autre_dico.txt");
+        dictCombo.setValue("src/mots.txt");
 
         // Choix de la police d'écriture
         Label policeLabel = new Label("Police d'écriture :");
@@ -313,44 +326,77 @@ public class Pendu extends Application {
         valider.setStyle("-fx-background-color: #B784A7; -fx-text-fill: white; -fx-font-weight: bold;");
         valider.setOnAction(e -> {
             // Appliquer les paramètres
-            // Couleur principale
             String couleur = colorPicker.getValue().toString().replace("0x", "#").substring(0, 7);
+            int longueurMots = longueurMotsSpinner.getValue();
+            String dictFile = dictCombo.getValue();
+            // Vérification du dictionnaire et de la longueur des mots
+            MotMystere testModele = new MotMystere(dictFile, longueurMots, longueurMots, MotMystere.FACILE, 10);
+            int nbMotsDispo = testModele.getNombreMotsDictionnaire();
+            if (nbMotsDispo < 1) {
+                this.popUpErreurDictionnaire("Aucun mot de " + longueurMots + " lettres n'a été trouvé dans le dictionnaire sélectionné.\nVeuillez choisir un autre fichier ou changer la longueur des mots.").showAndWait();
+                return;
+            }
+            // Couleur principale
             this.fenetrePrincipale.setStyle("-fx-background-color:" + couleur + ";");
-            // Nombre de mots (à stocker si besoin)
-            // Dictionnaire (à recharger si besoin)
+            // On réinstancie le modèle avec la nouvelle longueur de mots
+            this.modelePendu = new MotMystere(dictFile, longueurMots, longueurMots, MotMystere.FACILE, 10);
             // Police d'écriture (à appliquer sur les labels principaux)
             this.setMainFont(policeCombo.getValue());
             // Retour au menu
             this.modeAccueil();
         });
 
-        root.getChildren().addAll(titre, couleurLabel, colorPicker, nbMotsLabel, nbMotsSpinner, dictLabel, dictCombo, policeLabel, policeCombo, valider);
+        root.getChildren().addAll(titre, couleurLabel, colorPicker, longueurMotsLabel, longueurMotsSpinner, dictLabel, dictCombo, policeLabel, policeCombo, valider);
         this.panelCentral = new BorderPane(root);
         this.fenetrePrincipale.setCenter(this.panelCentral);
         reappliquerMainFont();
     }
 
+    // Affiche une popup d'erreur si le dictionnaire est vide ou invalide
+    public Alert popUpErreurDictionnaire(String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Erreur de dictionnaire");
+        alert.setHeaderText("Impossible de lancer la partie");
+        alert.setContentText(message);
+        return alert;
+    }
+
     /** lance une partie */
     public void lancePartie(){
-        int niveau = MotMystere.FACILE; // niveau par défaut
-         if (this.groupeNiveaux != null && this.groupeNiveaux.getSelectedToggle() != null) {
-        String choix = ((RadioButton)this.groupeNiveaux.getSelectedToggle()).getText();
-        if (choix.equals("Facile")) {
-        niveau = MotMystere.FACILE;
-        } else if (choix.equals("Moyen")) {
-        niveau = MotMystere.MOYEN;
-        } else if (choix.equals("Difficile")) {
-        niveau = MotMystere.DIFFICILE;
-        } else if (choix.equals("Expert")) {
-        niveau = MotMystere.EXPERT;
+        // Vérification du modèle avant de lancer la partie
+        int nbMotsDispo = this.modelePendu.getNombreMotsDictionnaire();
+        int nbMotsVoulu = 3; // valeur par défaut
+        try {
+            nbMotsVoulu = Integer.parseInt(System.getProperty("nbMots", "3"));
+        } catch (Exception ex) {}
+        if (nbMotsDispo < 1) {
+            this.popUpErreurDictionnaire("Aucun mot valide n'a été trouvé dans le dictionnaire sélectionné.\nVeuillez choisir un autre fichier ou réduire le nombre de mots dans les paramètres.").showAndWait();
+            this.modeAccueil();
+            return;
         }
-    }
+        if (nbMotsDispo < nbMotsVoulu) {
+            this.popUpErreurDictionnaire("Le dictionnaire ne contient pas assez de mots (" + nbMotsDispo + ").\nVeuillez réduire le nombre de mots ou choisir un autre dictionnaire dans les paramètres.").showAndWait();
+            this.modeAccueil();
+            return;
+        }
+        int niveau = MotMystere.FACILE; // niveau par défaut
+        if (this.groupeNiveaux != null && this.groupeNiveaux.getSelectedToggle() != null) {
+            String choix = ((RadioButton)this.groupeNiveaux.getSelectedToggle()).getText();
+            if (choix.equals("Facile")) {
+                niveau = MotMystere.FACILE;
+            } else if (choix.equals("Moyen")) {
+                niveau = MotMystere.MOYEN;
+            } else if (choix.equals("Difficile")) {
+                niveau = MotMystere.DIFFICILE;
+            } else if (choix.equals("Expert")) {
+                niveau = MotMystere.EXPERT;
+            }
+        }
         this.modelePendu.setNiveau(niveau);
         this.modelePendu.setMotATrouver();
         this.chrono.resetTime();
         this.modeJeu();
         this.majAffichage();
-        
     }
 
     /**
@@ -398,7 +444,7 @@ public class Pendu extends Application {
     }
 
     public Alert popUpPartieEnCours(){
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION,"La partie est en cours!\n Etes-vous sûr de l'interrompre ?", ButtonType.YES, ButtonType.NO);
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION,"La partie est en cours!\nEtes-vous sûr de l'interrompre ?", ButtonType.YES, ButtonType.NO);
         alert.setTitle("Attention");
         return alert;
     }

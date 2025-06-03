@@ -71,4 +71,11 @@ public class Dictionnaire {
         int i = rand.nextInt(lesMots.size());
         return this.lesMots.get(i);
     }
+
+    /**
+     * Retourne le nombre de mots disponibles dans le dictionnaire
+     */
+    public int getNombreMots() {
+        return this.lesMots.size();
+    }
 }

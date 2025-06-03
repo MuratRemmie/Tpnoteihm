@@ -289,4 +289,12 @@ public class MotMystere {
     public void setNbErreursMax(int nbErreursMax) {
         this.nbErreursMax = nbErreursMax;
     }
+
+    /**
+     * Retourne le nombre de mots disponibles dans le dictionnaire associé
+     */
+    public int getNombreMotsDictionnaire() {
+        if (this.dict == null) return 0;
+        return this.dict.getNombreMots();
+    }
 }
