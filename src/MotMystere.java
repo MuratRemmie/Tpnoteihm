@@ -47,13 +47,12 @@ public class MotMystere {
     /**
      * le nombre total de tentatives autorisées
      */
-    private int nbErreursMax;
+    private int nbEerreursMax;
     /**
      * dictionnaire dans lequel on choisit les mots
      */
     private Dictionnaire dict;
 
-    private boolean partieDemarree = false;
 
     /**
      * constructeur dans lequel on impose le mot à trouver
@@ -78,7 +77,8 @@ public class MotMystere {
     public MotMystere(String nomFichier, int longMin, int longMax, int niveau, int nbErreursMax) {
         super();
         this.dict = new Dictionnaire(nomFichier,longMin,longMax);
-        this.partieDemarree = false;
+        String motATrouver = dict.choisirMot();
+        this.initMotMystere(motATrouver, niveau, nbErreursMax);
     }
 
     /**
@@ -88,52 +88,43 @@ public class MotMystere {
      * @param nbErreursMax  le nombre total d'essais autorisés
      */
     private void initMotMystere(String motATrouver, int niveau, int nbErreursMax){
-        this.niveau = niveau;
-        this.nbEssais = 0;
+        this.niveau =niveau;
+        this.nbEssais=0;
         this.motATrouver = Dictionnaire.sansAccents(motATrouver).toUpperCase();
         this.motCrypte = "";
         this.lettresEssayees = new HashSet<>();
-        this.nbLettresRestantes = 0;
-        this.nbErreursMax = nbErreursMax;
-        this.nbErreursRestantes = nbErreursMax;
 
-        if (motATrouver.length() < 2) {
-            throw new IllegalArgumentException("Le mot à trouver doit faire au moins 2 lettres");
-        }
-
-        // Première lettre
+        nbLettresRestantes=0;
+        
         if (niveau == MotMystere.EXPERT || niveau == MotMystere.DIFFICILE){
-            motCrypte += "*";
-            this.nbLettresRestantes += 1;
-        } else {
-            motCrypte += this.motATrouver.charAt(0);
+            motCrypte = "*"; // premiere lettre cachée
+            this.nbLettresRestantes+=1;
         }
-
-        // Lettres du milieu
+        else{
+            motCrypte += this.motATrouver.charAt(0); // premiere lettre révélée
+        }
+        
         for (int i=1; i<motATrouver.length()-1; i++){
             char lettre = this.motATrouver.charAt(i);
-            if (niveau == MotMystere.FACILE) {
-                motCrypte += "*";
+            if (this.niveau == MotMystere.EXPERT || Character.isAlphabetic(lettre)){
+                motCrypte += "*"; // lettre cachée
                 this.nbLettresRestantes += 1;
-            } else if (niveau == MotMystere.EXPERT
-                || niveau == MotMystere.DIFFICILE
-                || (niveau == MotMystere.MOYEN && Character.isAlphabetic(lettre))) {
-                motCrypte += "*";
-                this.nbLettresRestantes += 1;
-            } else {
-                motCrypte += lettre;
+            }   
+            else{
+                motCrypte += lettre; // lettre révélée si c'est un trait d'union ET qu'on n'est pas en mode Expert
             }
         }
-
-        // Dernière lettre
-        if (niveau != MotMystere.FACILE){
+        
+        if (niveau != MotMystere.FACILE){ // dernière lettre révélée
             motCrypte += "*";
             this.nbLettresRestantes += 1;
-        } else {
-            motCrypte += this.motATrouver.charAt(motATrouver.length()-1);
         }
-
-        System.out.println("motCrypte=" + motCrypte + " nbLettresRestantes=" + nbLettresRestantes + " nbErreursRestantes=" + nbErreursRestantes);
+        else{
+            motCrypte += this.motATrouver.charAt(motATrouver.length()-1);
+            // dernière lettre cachée
+        }
+        this.nbEerreursMax = nbErreursMax;
+         this.nbErreursRestantes = nbErreursMax;
     }
 
     /**
@@ -154,16 +145,14 @@ public class MotMystere {
      * @param motATrouver le nouveau mot à trouver
      */
     public void setMotATrouver(String motATrouver) {
-        this.initMotMystere(motATrouver, this.niveau, this.nbErreursMax);
-        this.partieDemarree = true;
+        this.initMotMystere(motATrouver, this.niveau, this.nbEerreursMax);
     }
 
     /**
      * Réinitialise le jeu avec un nouveau mot à trouver choisi au hasard dans le dictionnaire
      */
     public void setMotATrouver() {
-        this.initMotMystere(this.dict.choisirMot(), this.niveau, this.nbErreursMax);
-        this.partieDemarree = true;
+        this.initMotMystere(this.dict.choisirMot(), this.niveau, this.nbEerreursMax);
     }
 
     /**
@@ -206,7 +195,7 @@ public class MotMystere {
      * @return le nombre total de tentatives autorisées
      */
     public int getNbErreursMax(){
-        return this.nbErreursMax;
+        return this.nbEerreursMax;
     }
 
     /**
@@ -220,7 +209,7 @@ public class MotMystere {
      * @return un booléen indiquant si le joueur a perdu
      */
     public boolean perdu(){
-        return this.nbErreursRestantes <= 0;
+        return this.nbErreursRestantes == 0;
     }
 
     /**
@@ -253,23 +242,25 @@ public class MotMystere {
         if (nbNouvelles == 0){
             this.nbErreursRestantes-=1;
         }
-        System.out.println("motCrypte=" + motCrypte + " nbLettresRestantes=" + nbLettresRestantes + " nbErreursRestantes=" + nbErreursRestantes);
         return nbNouvelles;
     }
 
-    public boolean partieEnCours() {
-        return partieDemarree
-            && motATrouver != null
-            && !motATrouver.isEmpty()
-            && !gagne()
-            && !perdu();
+    /**
+     * @return une chaine de caractère donnant l'état du jeu
+     */
+    public String toString(){
+        return "Mot a trouve: "+this.motATrouver+" Lettres trouvees: "+
+               this.motCrypte+" nombre de lettres restantes "+this.nbLettresRestantes+
+               " nombre d'essais restents: "+this.nbErreursRestantes;
     }
 
-    @Override
-    public String toString() {
-        return "Mot a trouver: " + this.motATrouver +
-               " Lettres trouvees: " + this.motCrypte +
-               " nombre de lettres restantes: " + this.nbLettresRestantes +
-               " nombre d'essais restants: " + this.nbErreursRestantes;
+
+    public boolean partieEnCours() {
+        return nbLettresRestantes > 0 && nbErreursRestantes > 0;
+
+
     }
+
+    public int getNbErreurs(){
+        return this.nbEerreursMax - this.nbLettresRestantes;}
 }
