@@ -297,4 +297,11 @@ public class MotMystere {
         if (this.dict == null) return 0;
         return this.dict.getNombreMots();
     }
+    
+    /**
+     * Termine explicitement la partie en cours (pour éviter les popups multiples)
+     */
+    public void setFinPartie() {
+        this.partieDemarree = false;
+    }
 }

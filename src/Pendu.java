@@ -117,12 +117,15 @@ public class Pendu extends Application {
         this.boutonMaison.setGraphic(new ImageView(new Image("file:img/home.png", 32, 32, true, true)));
         this.boutonMaison.setStyle("-fx-background-color: white; -fx-border-radius: 5; -fx-background-radius: 5;");
         this.boutonMaison.setOnAction(e -> {
+            // Correction : ne demander la confirmation qu'une seule fois
             if (this.modelePendu.partieEnCours()) {
                 Alert alert = this.popUpPartieEnCours();
                 alert.showAndWait();
                 if (alert.getResult() != ButtonType.YES) {
                     return;
                 }
+                // On arrête la partie explicitement pour éviter le double popup
+                this.modelePendu.setFinPartie();
             }
             this.modeAccueil();
         });
@@ -257,20 +260,12 @@ public class Pendu extends Application {
     }
 
     public void modeAccueil(){
-        // Si une partie est en cours, demander confirmation avant de quitter
-        if (this.modelePendu.partieEnCours()) {
-            Alert alert = this.popUpPartieEnCours();
-            alert.showAndWait();
-            if (alert.getResult() != ButtonType.YES) {
-                // L'utilisateur a annulé, on ne quitte pas la partie
-                return;
-            }
-        }
+        // Correction : ne pas redemander la confirmation ici si déjà fait dans boutonMaison
         this.panelCentral = this.fenetreAccueil();
         this.fenetrePrincipale.setCenter(this.panelCentral);
         this.boutonMaison.setDisable(true);
         this.boutonParametres.setVisible(true);
-        this.boutonParametres.setDisable(false); // Toujours réactiver le bouton paramètres
+        this.boutonParametres.setDisable(false);
         reappliquerMainFont();
     }
 
