@@ -221,7 +221,8 @@ public class Pendu extends Application {
         jeu.setText("Jeu du pendu ");
 
         this.bJouer= new Button("Lancer une partie");
-        this.bJouer.setOnAction(new ControleurLancerPartie(this.modelePendu, this));
+        this.bJouer.setStyle("-fx-font-size: 20px; -fx-padding: 15 30 15 30; -fx-background-radius: 10; -fx-background-color: #B784A7; -fx-text-fill: white; -fx-font-weight: bold;");
+        this.bJouer.setOnAction(e -> this.lancePartie());
 
         ToggleGroup niv = new ToggleGroup();
         RadioButton facile = new RadioButton("Facile");
@@ -236,11 +237,17 @@ public class Pendu extends Application {
 
         this.groupeNiveaux = niv;
 
-        VBox root = new VBox();
-        root.getChildren().addAll(bJouer, facile, moyen, difficile, expert);
-       
+        VBox niveauxBox = new VBox(20, facile, moyen, difficile, expert);
+        niveauxBox.setAlignment(javafx.geometry.Pos.CENTER);
+        niveauxBox.setStyle("-fx-font-size: 18px; -fx-padding: 30 0 30 0; -fx-background-color: #f5f5f5; -fx-background-radius: 15;");
+        niveauxBox.setMaxWidth(300);
+
+        VBox root = new VBox(40);
+        root.setAlignment(javafx.geometry.Pos.TOP_CENTER);
+        root.getChildren().addAll(bJouer, niveauxBox);
+        root.setStyle("-fx-background-color: transparent; -fx-padding: 40 0 0 0;");
+
         BorderPane pane = new BorderPane();
-        // Ne pas ajouter de pane.setTop(head);
         pane.setCenter(root);
         return pane;
        
