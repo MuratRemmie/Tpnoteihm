@@ -387,9 +387,18 @@ public class Pendu extends Application {
 
     /** lance une partie */
     public void lancePartie(){
-        // Si longueur aléatoire, choisir une longueur au hasard et ré-instancier le modèle
+        // Si longueur aléatoire, choisir une longueur présente dans le dictionnaire
         if (this.longueurAleatoire) {
-            int longueur = this.longMinParam + (int)(Math.random() * (this.longMaxParam - this.longMinParam + 1));
+            Dictionnaire dico = new Dictionnaire(this.dictFileParam, this.longMinParam, this.longMaxParam);
+            List<Integer> longueurs = dico.getLongueurs();
+            if (longueurs.isEmpty()) {
+                this.popUpErreurDictionnaire("Aucun mot valide n'a été trouvé dans le dictionnaire sélectionné.").showAndWait();
+                this.modeAccueil();
+                return;
+            }
+            // Tirer une longueur au hasard parmi les longueurs existantes
+            int idx = (int)(Math.random() * longueurs.size());
+            int longueur = longueurs.get(idx);
             this.modelePendu = new MotMystere(this.dictFileParam, longueur, longueur, MotMystere.FACILE, 10);
         }
         // Vérification du modèle avant de lancer la partie
