@@ -80,6 +80,7 @@ public class Pendu extends Application {
     private Button bJouer;
     private  BorderPane fenetrePrincipale ; 
     private ToggleGroup groupeNiveaux;
+    private Label labelTemps;
 
     /**
     
@@ -175,6 +176,7 @@ public class Pendu extends Application {
          this.pg = new ProgressBar(0.0);
          centre.getChildren().addAll(this.dessin, this.pg);
 
+         this.labelTemps = new Label("Temps : 0:00");
          VBox aDroite = new VBox();
          int valniv = this.modelePendu.getNiveau();
          String niv = this.niveaux.get(valniv);
@@ -182,7 +184,7 @@ public class Pendu extends Application {
 
          TitledPane chrono = this.leChrono();
          Button nvmot = new Button("Nouveau mot");
-         aDroite.getChildren().addAll(leNiveau, chrono, nvmot);
+         aDroite.getChildren().addAll(leNiveau, chrono, labelTemps, nvmot);
 
          VBox bas = new VBox();
          this.clavier = new Clavier("ABCDEFGHIJKLMNOPQRSTUVWXYZ", new ControleurLettres(this.modelePendu, this));
@@ -327,7 +329,7 @@ public class Pendu extends Application {
         this.leNiveau.setText(this.niveaux.get(this.modelePendu.getNiveau()));
 
         this.clavier.majAffichage(this.modelePendu.getLettresEssayees());
-        this.chrono.setTime(this.modelePendu.getTempsEcoule());
+        this.chrono.setTime(this.chrono.getTempsEcoule());
 
         // Pour afficher le temps en texte
         labelTemps.setText("Temps : " + chrono.getText());
