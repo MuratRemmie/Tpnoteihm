@@ -1,4 +1,3 @@
-
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -51,6 +50,12 @@ public class Clavier extends TilePane{
             }else{
                 t.setDisable(false);
             }
+        }
+    }
+
+    public void majAffichage(Set<String> lettresEssayees) {
+        for (Button bouton : clavier) {
+            bouton.setDisable(lettresEssayees.contains(bouton.getText()));
         }
     }
 }
