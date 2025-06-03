@@ -53,6 +53,7 @@ public class MotMystere {
      */
     private Dictionnaire dict;
 
+    private boolean partieDemarree = false;
 
     /**
      * constructeur dans lequel on impose le mot à trouver
@@ -77,8 +78,7 @@ public class MotMystere {
     public MotMystere(String nomFichier, int longMin, int longMax, int niveau, int nbErreursMax) {
         super();
         this.dict = new Dictionnaire(nomFichier,longMin,longMax);
-        String motATrouver = dict.choisirMot();
-        this.initMotMystere(motATrouver, niveau, nbErreursMax);
+        this.partieDemarree = false;
     }
 
     /**
@@ -146,6 +146,7 @@ public class MotMystere {
      */
     public void setMotATrouver(String motATrouver) {
         this.initMotMystere(motATrouver, this.niveau, this.nbEerreursMax);
+        this.partieDemarree = true;
     }
 
     /**
@@ -153,6 +154,7 @@ public class MotMystere {
      */
     public void setMotATrouver() {
         this.initMotMystere(this.dict.choisirMot(), this.niveau, this.nbEerreursMax);
+        this.partieDemarree = true;
     }
 
     /**
@@ -246,7 +248,8 @@ public class MotMystere {
     }
 
     public boolean partieEnCours() {
-        return motATrouver != null
+        return partieDemarree
+            && motATrouver != null
             && !motATrouver.isEmpty()
             && !gagne()
             && !perdu();
