@@ -306,6 +306,10 @@ public class Pendu extends Application {
         Label longueurMotsLabel = new Label("Longueur des mots (nombre de lettres) :");
         Spinner<Integer> longueurMotsSpinner = new Spinner<>(3, 12, 5);
         longueurMotsSpinner.setEditable(true);
+        CheckBox aleatoireCheck = new CheckBox("Longueur aléatoire");
+        aleatoireCheck.setStyle("-fx-font-size: 16px;");
+        aleatoireCheck.setSelected(false);
+        longueurMotsSpinner.disableProperty().bind(aleatoireCheck.selectedProperty());
 
         // Choix du dictionnaire
         Label dictLabel = new Label("Dictionnaire :");
@@ -327,28 +331,46 @@ public class Pendu extends Application {
         Button valider = new Button("Valider");
         valider.setStyle("-fx-background-color: #B784A7; -fx-text-fill: white; -fx-font-weight: bold;");
         valider.setOnAction(e -> {
-            // Appliquer les paramètres
             String couleur = colorPicker.getValue().toString().replace("0x", "#").substring(0, 7);
+            boolean aleatoire = aleatoireCheck.isSelected();
             int longueurMots = longueurMotsSpinner.getValue();
             String dictFile = dictCombo.getValue();
+            int longMin = 3;
+            int longMax = 12;
+            if (aleatoire) {
+                // Calculer min/max à partir des mots du dictionnaire
+                Dictionnaire dico = new Dictionnaire(dictFile, 3, 100);
+                List<Integer> longueurs = dico.getLongueurs();
+                int min = 100, max = 3;
+                for (int l : longueurs) {
+                    if (l < min) min = l;
+                    if (l > max) max = l;
+                }
+                longMin = (longueurs.isEmpty() ? 3 : min);
+                longMax = (longueurs.isEmpty() ? 12 : max);
+                longueurMots = -1; // signal pour aléatoire
+            }
             // Vérification du dictionnaire et de la longueur des mots
-            MotMystere testModele = new MotMystere(dictFile, longueurMots, longueurMots, MotMystere.FACILE, 10);
+            int testLong = (aleatoire ? longMin : longueurMots);
+            MotMystere testModele = new MotMystere(dictFile, testLong, testLong, MotMystere.FACILE, 10);
             int nbMotsDispo = testModele.getNombreMotsDictionnaire();
             if (nbMotsDispo < 1) {
-                this.popUpErreurDictionnaire("Aucun mot de " + longueurMots + " lettres n'a été trouvé dans le dictionnaire sélectionné.\nVeuillez choisir un autre fichier ou changer la longueur des mots.").showAndWait();
+                this.popUpErreurDictionnaire("Aucun mot de " + (aleatoire ? (longMin + " à " + longMax) : longueurMots) + " lettres n'a été trouvé dans le dictionnaire sélectionné.\nVeuillez choisir un autre fichier ou changer la longueur des mots.").showAndWait();
                 return;
             }
-            // Couleur principale
             this.fenetrePrincipale.setStyle("-fx-background-color:" + couleur + ";");
-            // On réinstancie le modèle avec la nouvelle longueur de mots
-            this.modelePendu = new MotMystere(dictFile, longueurMots, longueurMots, MotMystere.FACILE, 10);
-            // Police d'écriture (à appliquer sur les labels principaux)
+            // Stocker l'info aléatoire dans une variable d'instance
+            this.longueurAleatoire = aleatoire;
+            this.longueurMotsParam = longueurMots;
+            this.dictFileParam = dictFile;
+            this.longMinParam = longMin;
+            this.longMaxParam = longMax;
+            this.modelePendu = new MotMystere(dictFile, (aleatoire ? longMin : longueurMots), (aleatoire ? longMax : longueurMots), MotMystere.FACILE, 10);
             this.setMainFont(policeCombo.getValue());
-            // Retour au menu
             this.modeAccueil();
         });
 
-        root.getChildren().addAll(titre, couleurLabel, colorPicker, longueurMotsLabel, longueurMotsSpinner, dictLabel, dictCombo, policeLabel, policeCombo, valider);
+        root.getChildren().addAll(titre, couleurLabel, colorPicker, longueurMotsLabel, longueurMotsSpinner, aleatoireCheck, dictLabel, dictCombo, policeLabel, policeCombo, valider);
         this.panelCentral = new BorderPane(root);
         this.fenetrePrincipale.setCenter(this.panelCentral);
         reappliquerMainFont();
@@ -365,6 +387,11 @@ public class Pendu extends Application {
 
     /** lance une partie */
     public void lancePartie(){
+        // Si longueur aléatoire, choisir une longueur au hasard et ré-instancier le modèle
+        if (this.longueurAleatoire) {
+            int longueur = this.longMinParam + (int)(Math.random() * (this.longMaxParam - this.longMinParam + 1));
+            this.modelePendu = new MotMystere(this.dictFileParam, longueur, longueur, MotMystere.FACILE, 10);
+        }
         // Vérification du modèle avant de lancer la partie
         int nbMotsDispo = this.modelePendu.getNombreMotsDictionnaire();
         int nbMotsVoulu = 3; // valeur par défaut
@@ -552,4 +579,11 @@ public void retourAccueil() {
 
     // Chronomètre fonctionnel
     private Label chronoLabel = null; // Affichage du chrono
+
+    // --- Ajout pour gestion longueur aléatoire ---
+    private boolean longueurAleatoire = false;
+    private int longueurMotsParam = 5;
+    private String dictFileParam = "src/mots.txt";
+    private int longMinParam = 3;
+    private int longMaxParam = 12;
 }

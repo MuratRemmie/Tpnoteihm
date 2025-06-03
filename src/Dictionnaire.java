@@ -78,4 +78,15 @@ public class Dictionnaire {
     public int getNombreMots() {
         return this.lesMots.size();
     }
+
+    /**
+     * Retourne la liste des longueurs des mots du dictionnaire
+     */
+    public List<Integer> getLongueurs() {
+        List<Integer> longueurs = new ArrayList<>();
+        for (String mot : this.lesMots) {
+            longueurs.add(mot.length());
+        }
+        return longueurs;
+    }
 }
