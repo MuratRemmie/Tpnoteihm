@@ -1,17 +1,11 @@
 import javafx.application.Application;
-import javafx.geometry.Insets;
-import javafx.scene.text.Font;
 import javafx.stage.Stage;
-import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
-import javafx.scene.text.TextAlignment;
-import javafx.scene.control.ButtonBar.ButtonData ;
 
 import java.util.List;
 import java.util.Arrays;
@@ -67,6 +61,14 @@ public class Pendu extends Application {
      */
     private BorderPane panelCentral;
     /**
+     * le bouton qui permet de (lancer ou relancer une partie
+     */ 
+    private Button bJouer;
+    private  BorderPane fenetrePrincipale ; 
+    private ToggleGroup groupeNiveaux;
+    private Label labelTemps;
+
+    /**
      * le bouton Paramètre / Engrenage
      */
     private Button boutonParametres;
@@ -74,13 +76,6 @@ public class Pendu extends Application {
      * le bouton Accueil / Maison
      */    
     private Button boutonMaison;
-    /**
-     * le bouton qui permet de (lancer ou relancer une partie
-     */ 
-    private Button bJouer;
-    private  BorderPane fenetrePrincipale ; 
-    private ToggleGroup groupeNiveaux;
-    private Label labelTemps;
 
     /**
     
@@ -121,21 +116,12 @@ public class Pendu extends Application {
         Label jeu = new Label();
         jeu.setText("Jeu du pendu ");
 
-        Button home = new Button();
-        Image homeImage = new Image("file:img/home.png");
-        ImageView homeView = new ImageView(homeImage);
-        homeView.setFitHeight(20);
-        homeView.setFitWidth(20);
-        home.setGraphic(homeView);
-        home.setOnAction(e -> this.modeAccueil());
+        // Utilisation des attributs boutonMaison et boutonParametres
+        this.boutonMaison.setGraphic(new ImageView(new Image("file:img/home.png", 20, 20, true, true)));
+        this.boutonMaison.setOnAction(e -> this.modeAccueil());
 
-        Button param = new Button();
-        Image paramImage = new Image("file:img/parametres.png");
-        ImageView paramView = new ImageView(paramImage);
-        paramView.setFitHeight(20);
-        paramView.setFitWidth(20);
-        param.setGraphic(paramView);
-        param.setOnAction(e -> this.modeParametres());
+        this.boutonParametres.setGraphic(new ImageView(new Image("file:img/parametres.png", 20, 20, true, true)));
+        this.boutonParametres.setOnAction(e -> this.modeParametres());
 
         Button info = new Button();
         Image infoImage = new Image("file:img/info.png");
@@ -144,9 +130,7 @@ public class Pendu extends Application {
         infoView.setFitWidth(20);
         info.setGraphic(infoView);
 
-    
-        head.getChildren().addAll(jeu, home, param, info);
-
+        head.getChildren().addAll(jeu, this.boutonMaison, this.boutonParametres, info);
         borderPane.setTop(head);
         return borderPane;
     }
@@ -211,28 +195,16 @@ public class Pendu extends Application {
         Label jeu = new Label();
         jeu.setText("Jeu du pendu ");
 
-        Button home = new Button();
-        Image homeImage = new Image("file:img/home.png");
-        
-        ImageView homeView = new ImageView(homeImage);
-        homeView.setFitHeight(20);
-        homeView.setFitWidth(20);
-        home.setGraphic(homeView);
-
-        Button param = new Button();
-        Image paramImage = new Image("file:img/parametres.png");
-        ImageView paramView = new ImageView(paramImage);
-        paramView.setFitHeight(20);
-        paramView.setFitWidth(20);
-        param.setGraphic(paramView);
-
+        // Utilisation des attributs boutonMaison et boutonParametres
+        this.boutonMaison.setGraphic(new ImageView(new Image("file:img/home.png", 20, 20, true, true)));
+        this.boutonParametres.setGraphic(new ImageView(new Image("file:img/parametres.png", 20, 20, true, true)));
         Button info = new Button();
         Image infoImage = new Image("file:img/info.png");
         ImageView infoView = new ImageView(infoImage);
         infoView.setFitHeight(20);
         infoView.setFitWidth(20);
         info.setGraphic(infoView);
-        head.getChildren().addAll(jeu, home, param, info);
+        head.getChildren().addAll(jeu, this.boutonMaison, this.boutonParametres, info);
 
         this.bJouer= new Button("Lancer une partie");
         this.bJouer.setOnAction(new ControleurLancerPartie(this.modelePendu, this));
@@ -320,7 +292,8 @@ public class Pendu extends Application {
         
         this.motCrypte.setText(this.modelePendu.getMotCrypte());
         int nombreErreursRealiser = this.modelePendu.getNbErreursMax()  - this.modelePendu.getNbErreursRestants();
-        this.dessin.setImage(this.lesImages.get(nombreErreursRealiser));    
+        int imageIndex = Math.min(nombreErreursRealiser, this.lesImages.size() - 1);
+        this.dessin.setImage(this.lesImages.get(imageIndex));    
 
         int nombreErreursMaximum = this.modelePendu.getNbErreursMax();
         double progression = (double) nombreErreursRealiser / nombreErreursMaximum ;
@@ -374,7 +347,7 @@ public class Pendu extends Application {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);   
          alert.setTitle("Victoire");
         alert.setHeaderText("Vous avez gagné !");
-        alert.setContentText("Le mot était : " + this.modelePendu.getMotATrouve());
+        alert.setContentText("Le mot était : " + this.modelePendu.getMotATrouver());
         return alert;
     }
     
@@ -383,7 +356,7 @@ public class Pendu extends Application {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Dommage");
         alert.setHeaderText("Vous avez perdu !");
-        alert.setContentText("Le mot a trouver était : " + this.modelePendu.getMotATrouve());
+        alert.setContentText("Le mot a trouver était : " + this.modelePendu.getMotATrouver());
         return alert;
     }
 
