@@ -110,28 +110,35 @@ public class Pendu extends Application {
      */
     private Pane titre(){
         BorderPane borderPane = new BorderPane();
+        borderPane.setStyle("-fx-background-color:#B784A7; -fx-padding: 10px;");
 
-        HBox head = new HBox();
-        head.setStyle("-fx-background-color:#B784A7; -fx-padding: 10px;");
-        Label jeu = new Label();
-        jeu.setText("Jeu du pendu ");
+        Label jeu = new Label("Jeu du Pendu");
+        jeu.setStyle("-fx-font-size: 32px; -fx-font-weight: bold; -fx-text-fill: #222;");
+        borderPane.setLeft(jeu);
 
-        // Utilisation des attributs boutonMaison et boutonParametres
-        this.boutonMaison.setGraphic(new ImageView(new Image("file:img/home.png", 20, 20, true, true)));
+        // (Ré)initialisation des boutons pour éviter les problèmes d'affichage
+        this.boutonMaison = new Button();
+        this.boutonMaison.setGraphic(new ImageView(new Image("file:img/home.png", 32, 32, true, true)));
+        this.boutonMaison.setStyle("-fx-background-color: white; -fx-border-radius: 5; -fx-background-radius: 5;");
         this.boutonMaison.setOnAction(e -> this.modeAccueil());
 
-        this.boutonParametres.setGraphic(new ImageView(new Image("file:img/parametres.png", 20, 20, true, true)));
+        this.boutonParametres = new Button();
+        this.boutonParametres.setGraphic(new ImageView(new Image("file:img/parametres.png", 32, 32, true, true)));
+        this.boutonParametres.setStyle("-fx-background-color: white; -fx-border-radius: 5; -fx-background-radius: 5;");
         this.boutonParametres.setOnAction(e -> this.modeParametres());
 
         Button info = new Button();
         Image infoImage = new Image("file:img/info.png");
         ImageView infoView = new ImageView(infoImage);
-        infoView.setFitHeight(20);
-        infoView.setFitWidth(20);
+        infoView.setFitHeight(32);
+        infoView.setFitWidth(32);
         info.setGraphic(infoView);
+        info.setStyle("-fx-background-color: white; -fx-border-radius: 5; -fx-background-radius: 5;");
 
-        head.getChildren().addAll(jeu, this.boutonMaison, this.boutonParametres, info);
-        borderPane.setTop(head);
+        HBox boutons = new HBox(10, this.boutonMaison, this.boutonParametres, info);
+        boutons.setStyle("-fx-alignment: center-right;");
+        borderPane.setRight(boutons);
+
         return borderPane;
     }
 
@@ -194,17 +201,6 @@ public class Pendu extends Application {
         head.setStyle("-fx-background-color:#B784A7; -fx-padding: 10px;");
         Label jeu = new Label();
         jeu.setText("Jeu du pendu ");
-
-        // Utilisation des attributs boutonMaison et boutonParametres
-        this.boutonMaison.setGraphic(new ImageView(new Image("file:img/home.png", 20, 20, true, true)));
-        this.boutonParametres.setGraphic(new ImageView(new Image("file:img/parametres.png", 20, 20, true, true)));
-        Button info = new Button();
-        Image infoImage = new Image("file:img/info.png");
-        ImageView infoView = new ImageView(infoImage);
-        infoView.setFitHeight(20);
-        infoView.setFitWidth(20);
-        info.setGraphic(infoView);
-        head.getChildren().addAll(jeu, this.boutonMaison, this.boutonParametres, info);
 
         this.bJouer= new Button("Lancer une partie");
         this.bJouer.setOnAction(new ControleurLancerPartie(this.modelePendu, this));
@@ -336,7 +332,7 @@ public class Pendu extends Application {
     }
         
     public Alert popUpReglesDuJeu(){
-        // A implementer
+        // A implenter
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         return alert;
     }
