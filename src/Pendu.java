@@ -386,4 +386,9 @@ public class Pendu extends Application {
     public static void main(String[] args) {
         launch(args);
     }    
+public void retourAccueil() {
+    this.panelCentral = this.fenetreAccueil();
+    this.fenetrePrincipale.setCenter(this.panelCentral);
+    this.boutonMaison.setDisable(true); // grise le bouton maison dans le menu
+}
 }
