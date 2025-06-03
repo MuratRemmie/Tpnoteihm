@@ -274,6 +274,10 @@ public class Pendu extends Application {
         }
     }
 
+    /**
+     * Méthode principale pour lancer l'application JavaFX.
+     * @param args Arguments de la ligne de commande (non utilisés ici)
+     */
     public void modeAccueil(){
         // Correction : ne pas redemander la confirmation ici si déjà fait dans boutonMaison
         this.panelCentral = this.fenetreAccueil();
@@ -284,6 +288,9 @@ public class Pendu extends Application {
         reappliquerMainFont();
     }
 
+    /**
+     * Applique la police principale à tous les éléments de l'interface.
+     */
     public void modeJeu(){
         this.panelCentral = this.fenetreJeu();
         this.fenetrePrincipale.setCenter(this.panelCentral);
@@ -296,7 +303,9 @@ public class Pendu extends Application {
         if (this.chronoLabel != null) this.chronoLabel.setText(this.chrono.getText());
     }
     
-    // Affiche la fenêtre des paramètres
+    /** Affiche la fenêtre des paramètres du jeu (couleurs, police, dictionnaire, etc.).
+     * Met à jour dynamiquement l'UI selon les choix de l'utilisateur.
+     */
     public void modeParametres() {
         VBox root = new VBox(20);
         root.setStyle("-fx-padding: 30;");
@@ -438,7 +447,10 @@ public class Pendu extends Application {
         reappliquerMainFont();
     }
 
-    // Permet d'appliquer la couleur du header (barre du haut)
+    /**
+     * Applique la couleur du header (barre du haut) et rafraîchit l'affichage du header.
+     * @param couleurHex Couleur hexadécimale à appliquer au header (ex : "#B784A7")
+     */
     public void setHeaderColor(String couleurHex) {
         this.headerColorHex = couleurHex;
         // Rafraîchir le header si déjà affiché
@@ -448,7 +460,11 @@ public class Pendu extends Application {
         }
     }
 
-    // Affiche une popup d'erreur si le dictionnaire est vide ou invalide
+    /**
+     * Affiche une popup d'erreur si le dictionnaire est vide ou invalide.
+     * @param message Message d'erreur à afficher
+     * @return une alerte JavaFX configurée
+     */
     public Alert popUpErreurDictionnaire(String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Erreur de dictionnaire");
@@ -457,7 +473,8 @@ public class Pendu extends Application {
         return alert;
     }
 
-    /** lance une partie */
+    /**
+     * lance une partie */
     public void lancePartie(){
         // Si longueur aléatoire, choisir une longueur présente dans le dictionnaire
         if (this.longueurAleatoire) {
@@ -511,6 +528,9 @@ public class Pendu extends Application {
     }
 
     // Relance une partie instantanément avec les mêmes paramètres
+    /**
+     * Relance une partie instantanément avec les mêmes paramètres (mot différent).
+     */
     public void nouveauMotInstantane() {
         int niveau = this.modelePendu.getNiveau();
         int nbErreursMax = this.modelePendu.getNbErreursMax();
@@ -584,12 +604,20 @@ public class Pendu extends Application {
         return this.chrono; 
     }
 
+    /**
+     * Affiche une popup de confirmation si une partie est en cours.
+     * @return une alerte JavaFX de confirmation
+     */
     public Alert popUpPartieEnCours(){
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION,"La partie est en cours!\nEtes-vous sûr de l'interrompre ?", ButtonType.YES, ButtonType.NO);
         alert.setTitle("Attention");
         return alert;
     }
         
+    /**
+     * Affiche une popup d'information sur les règles du jeu du pendu.
+     * @return une alerte JavaFX d'information
+     */
     public Alert popUpReglesDuJeu(){
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Règles du jeu du Pendu");
@@ -603,6 +631,10 @@ public class Pendu extends Application {
         return alert;
     }
     
+    /**
+     * Affiche une popup de victoire.
+     * @return une alerte JavaFX d'information
+     */
     public Alert popUpMessageGagne(){
         
         Alert alert = new Alert(Alert.AlertType.INFORMATION);   
@@ -612,6 +644,10 @@ public class Pendu extends Application {
         return alert;
     }
     
+    /**
+     * Affiche une popup de défaite.
+     * @return une alerte JavaFX d'information
+     */
     public Alert popUpMessagePerdu(){
            
         Alert alert = new Alert(Alert.AlertType.INFORMATION);

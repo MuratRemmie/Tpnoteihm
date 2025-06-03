@@ -52,6 +52,9 @@ public class MotMystere {
      */
     private Dictionnaire dict;
 
+    /**
+     * indique si une partie a été démarrée
+     */
     private boolean partieDemarree = false;
 
 
@@ -285,17 +288,29 @@ public class MotMystere {
                " nombre d'essais restents: "+this.nbErreursRestantes;
     }
 
-
+    /**
+     * Indique si une partie est en cours
+     * @return true si une partie est en cours, false sinon
+     */
     public boolean partieEnCours() {
         boolean enCours = partieDemarree && nbLettresRestantes > 0 && nbErreursRestantes > 0;
         System.out.println("[DEBUG] partieEnCours(): partieDemarree=" + partieDemarree + ", nbLettresRestantes=" + nbLettresRestantes + ", nbErreursRestantes=" + nbErreursRestantes + " => " + enCours);
         return enCours;
     }
 
+
+    /**
+     * Retourne le nombre d'erreurs commises par le joueur
+     * @return le nombre d'erreurs commises
+     */
     public int getNbErreurs(){
         return this.nbErreursMax - this.nbErreursRestantes;
     }
 
+    /**
+     * Définit le nombre maximum d'erreurs autorisées pour la partie en cours
+     * @param nbErreursMax le nouveau nombre maximum d'erreurs autorisées
+     */
     public void setNbErreursMax(int nbErreursMax) {
         this.nbErreursMax = nbErreursMax;
     }
