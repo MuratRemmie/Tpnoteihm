@@ -134,7 +134,7 @@ public class MotMystere {
     /**
      * @return le mot à trouver
      */
-    public String getMotATrouve() {
+    public String getMotATrouver() {
         return this.motATrouver;
     }
 
@@ -283,5 +283,9 @@ public class MotMystere {
 
     public int getNbErreurs(){
         return this.nbErreursMax - this.nbErreursRestantes;
+    }
+
+    public void setNbErreursMax(int nbErreursMax) {
+        this.nbErreursMax = nbErreursMax;
     }
 }
