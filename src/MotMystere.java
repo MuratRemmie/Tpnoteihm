@@ -97,32 +97,27 @@ public class MotMystere {
         this.nbEerreursMax = nbErreursMax;
         this.nbErreursRestantes = nbErreursMax; // <-- bien réinitialisé ici
 
+        this.motCrypte = "";
         if (niveau == MotMystere.EXPERT || niveau == MotMystere.DIFFICILE){
-            motCrypte = "*"; // premiere lettre cachée
+            motCrypte = "*";
             this.nbLettresRestantes+=1;
+        } else {
+            motCrypte += this.motATrouver.charAt(0);
         }
-        else{
-            motCrypte += this.motATrouver.charAt(0); // premiere lettre révélée
-        }
-        
         for (int i=1; i<motATrouver.length()-1; i++){
             char lettre = this.motATrouver.charAt(i);
             if (this.niveau == MotMystere.EXPERT || Character.isAlphabetic(lettre)){
-                motCrypte += "*"; // lettre cachée
+                motCrypte += "*";
                 this.nbLettresRestantes += 1;
-            }   
-            else{
-                motCrypte += lettre; // lettre révélée si c'est un trait d'union ET qu'on n'est pas en mode Expert
+            } else {
+                motCrypte += lettre;
             }
         }
-        
-        if (niveau != MotMystere.FACILE){ // dernière lettre cachée
+        if (niveau != MotMystere.FACILE){
             motCrypte += "*";
             this.nbLettresRestantes += 1;
         } else {
             motCrypte += this.motATrouver.charAt(motATrouver.length()-1);
-            // dernière lettre révélée
-            // PAS d'incrément nbLettresRestantes ici, c'est correct
         }
         this.nbEerreursMax = nbErreursMax;
          this.nbErreursRestantes = nbErreursMax;
