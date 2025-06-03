@@ -166,9 +166,11 @@ public class Pendu extends Application {
          this.dessin.setPreserveRatio(true);
          this.pg = new ProgressBar(0.0);
          this.pg.setPrefWidth(300);
+         this.clavier = new Clavier("ABCDEFGHIJKLMNOPQRSTUVWXYZ", new ControleurLettres(this.modelePendu, this));
+         this.clavier.setStyle("-fx-font-size: 22px; -fx-spacing: 10px; -fx-padding: 20 0 20 0;");
          centre.setAlignment(javafx.geometry.Pos.CENTER);
          centre.setSpacing(20);
-         centre.getChildren().addAll(this.dessin, this.pg);
+         centre.getChildren().addAll(this.dessin, this.pg, this.clavier);
 
          VBox aDroite = new VBox();
          int valniv = this.modelePendu.getNiveau();
@@ -186,14 +188,6 @@ public class Pendu extends Application {
          aDroite.getChildren().setAll(niveauLabel, chrono, nvmot);
          aDroite.setAlignment(javafx.geometry.Pos.CENTER);
 
-         VBox bas = new VBox();
-         this.clavier = new Clavier("ABCDEFGHIJKLMNOPQRSTUVWXYZ", new ControleurLettres(this.modelePendu, this));
-         this.clavier.setStyle("-fx-font-size: 22px; -fx-spacing: 10px; -fx-padding: 20 0 20 0;");
-         bas.getChildren().add(this.clavier);
-         bas.setAlignment(javafx.geometry.Pos.CENTER);
-         bas.setStyle("-fx-padding: 20 0 0 0;");
-
-         // Ajoute le mot crypté au-dessus du centre
          VBox centreAvecMot = new VBox();
          centreAvecMot.setSpacing(20);
          centreAvecMot.setAlignment(javafx.geometry.Pos.CENTER);
@@ -201,8 +195,7 @@ public class Pendu extends Application {
 
          mid.setRight(aDroite);
          mid.setCenter(centreAvecMot);
-         mid.setBottom(bas);
-
+         // Suppression du bas, le clavier est déjà dans le centre
          return mid;
      }
 
