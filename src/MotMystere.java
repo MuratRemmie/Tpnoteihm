@@ -88,14 +88,15 @@ public class MotMystere {
      * @param nbErreursMax  le nombre total d'essais autorisés
      */
     private void initMotMystere(String motATrouver, int niveau, int nbErreursMax){
-        this.niveau =niveau;
-        this.nbEssais=0;
+        this.niveau = niveau;
+        this.nbEssais = 0;
         this.motATrouver = Dictionnaire.sansAccents(motATrouver).toUpperCase();
         this.motCrypte = "";
         this.lettresEssayees = new HashSet<>();
+        this.nbLettresRestantes = 0;
+        this.nbEerreursMax = nbErreursMax;
+        this.nbErreursRestantes = nbErreursMax; // <-- bien réinitialisé ici
 
-        nbLettresRestantes=0;
-        
         if (niveau == MotMystere.EXPERT || niveau == MotMystere.DIFFICILE){
             motCrypte = "*"; // premiere lettre cachée
             this.nbLettresRestantes+=1;
@@ -115,13 +116,13 @@ public class MotMystere {
             }
         }
         
-        if (niveau != MotMystere.FACILE){ // dernière lettre révélée
+        if (niveau != MotMystere.FACILE){ // dernière lettre cachée
             motCrypte += "*";
             this.nbLettresRestantes += 1;
-        }
-        else{
+        } else {
             motCrypte += this.motATrouver.charAt(motATrouver.length()-1);
-            // dernière lettre cachée
+            // dernière lettre révélée
+            // PAS d'incrément nbLettresRestantes ici, c'est correct
         }
         this.nbEerreursMax = nbErreursMax;
          this.nbErreursRestantes = nbErreursMax;
@@ -211,7 +212,7 @@ public class MotMystere {
      * @return un booléen indiquant si le joueur a perdu
      */
     public boolean perdu(){
-        return this.nbErreursRestantes == 0;
+        return this.nbErreursRestantes <= 0;
     }
 
     /**
@@ -244,6 +245,7 @@ public class MotMystere {
         if (nbNouvelles == 0){
             this.nbErreursRestantes-=1;
         }
+        System.out.println("motCrypte=" + motCrypte + " nbLettresRestantes=" + nbLettresRestantes + " nbErreursRestantes=" + nbErreursRestantes);
         return nbNouvelles;
     }
 
