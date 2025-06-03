@@ -14,8 +14,7 @@ public class MotMystere {
     public final static int DIFFICILE = 2;
     /** Niveau EXPERT : rien n'est donné, ni lettre ni trait d'union */
     public final static int EXPERT = 3;
-   
-
+    
     /**
      * le mot à trouver
      */
@@ -47,11 +46,13 @@ public class MotMystere {
     /**
      * le nombre total de tentatives autorisées
      */
-    private int nbEerreursMax;
+    private int nbErreursMax;
     /**
      * dictionnaire dans lequel on choisit les mots
      */
     private Dictionnaire dict;
+
+    private boolean partieDemarree = false;
 
 
     /**
@@ -77,8 +78,8 @@ public class MotMystere {
     public MotMystere(String nomFichier, int longMin, int longMax, int niveau, int nbErreursMax) {
         super();
         this.dict = new Dictionnaire(nomFichier,longMin,longMax);
-        String motATrouver = dict.choisirMot();
-        this.initMotMystere(motATrouver, niveau, nbErreursMax);
+        this.partieDemarree = false;
+        // Partie non démarrée ici, elle sera démarrée explicitement par setMotATrouver() dans lancePartie()
     }
 
     /**
@@ -88,6 +89,7 @@ public class MotMystere {
      * @param nbErreursMax  le nombre total d'essais autorisés
      */
     private void initMotMystere(String motATrouver, int niveau, int nbErreursMax){
+        System.out.println("[DEBUG] initMotMystere: motATrouver=" + motATrouver + ", niveau=" + niveau + ", nbErreursMax=" + nbErreursMax);
         this.niveau =niveau;
         this.nbEssais=0;
         this.motATrouver = Dictionnaire.sansAccents(motATrouver).toUpperCase();
@@ -123,8 +125,10 @@ public class MotMystere {
             motCrypte += this.motATrouver.charAt(motATrouver.length()-1);
             // dernière lettre cachée
         }
-        this.nbEerreursMax = nbErreursMax;
-         this.nbErreursRestantes = nbErreursMax;
+        this.nbErreursMax = nbErreursMax;
+        this.nbErreursRestantes = nbErreursMax;
+        System.out.println("[DEBUG] Après init: partieDemarree=" + partieDemarree + ", nbLettresRestantes=" + nbLettresRestantes + ", nbErreursRestantes=" + nbErreursRestantes);
+        // On ne touche pas à partieDemarree ici
     }
 
     /**
@@ -145,14 +149,20 @@ public class MotMystere {
      * @param motATrouver le nouveau mot à trouver
      */
     public void setMotATrouver(String motATrouver) {
-        this.initMotMystere(motATrouver, this.niveau, this.nbEerreursMax);
+        System.out.println("[DEBUG] setMotATrouver(String): avant, partieDemarree=" + partieDemarree);
+        this.initMotMystere(motATrouver, this.niveau, this.nbErreursMax);
+        this.partieDemarree = true;
+        System.out.println("[DEBUG] setMotATrouver(String): après, partieDemarree=" + partieDemarree);
     }
 
     /**
      * Réinitialise le jeu avec un nouveau mot à trouver choisi au hasard dans le dictionnaire
      */
     public void setMotATrouver() {
-        this.initMotMystere(this.dict.choisirMot(), this.niveau, this.nbEerreursMax);
+        System.out.println("[DEBUG] setMotATrouver(): avant, partieDemarree=" + partieDemarree);
+        this.initMotMystere(this.dict.choisirMot(), this.niveau, this.nbErreursMax);
+        this.partieDemarree = true;
+        System.out.println("[DEBUG] setMotATrouver(): après, partieDemarree=" + partieDemarree);
     }
 
     /**
@@ -195,7 +205,7 @@ public class MotMystere {
      * @return le nombre total de tentatives autorisées
      */
     public int getNbErreursMax(){
-        return this.nbEerreursMax;
+        return this.nbErreursMax;
     }
 
     /**
@@ -209,14 +219,24 @@ public class MotMystere {
      * @return un booléen indiquant si le joueur a perdu
      */
     public boolean perdu(){
-        return this.nbErreursRestantes == 0;
+        if (this.nbErreursRestantes == 0) {
+            this.partieDemarree = false;
+            System.out.println("[DEBUG] perdu(): partie perdue, partieDemarree=" + partieDemarree);
+            return true;
+        }
+        return false;
     }
 
     /**
      * @return un booléen indiquant si le joueur a gangé
      */
     public boolean gagne(){
-        return this.nbLettresRestantes == 0;
+        if (this.nbLettresRestantes == 0) {
+            this.partieDemarree = false;
+            System.out.println("[DEBUG] gagne(): partie gagnée, partieDemarree=" + partieDemarree);
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -256,11 +276,12 @@ public class MotMystere {
 
 
     public boolean partieEnCours() {
-        return nbLettresRestantes > 0 && nbErreursRestantes > 0;
-
-
+        boolean enCours = partieDemarree && nbLettresRestantes > 0 && nbErreursRestantes > 0;
+        System.out.println("[DEBUG] partieEnCours(): partieDemarree=" + partieDemarree + ", nbLettresRestantes=" + nbLettresRestantes + ", nbErreursRestantes=" + nbErreursRestantes + " => " + enCours);
+        return enCours;
     }
 
     public int getNbErreurs(){
-        return this.nbEerreursMax - this.nbLettresRestantes;}
+        return this.nbErreursMax - this.nbErreursRestantes;
+    }
 }
