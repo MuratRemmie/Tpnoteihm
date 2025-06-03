@@ -329,6 +329,12 @@ public class Pendu extends Application {
         this.clavier.majAffichage(this.modelePendu.getLettresEssayees());
         this.chrono.setTime(this.modelePendu.getTempsEcoule());
 
+        // Pour afficher le temps en texte
+        labelTemps.setText("Temps : " + chrono.getText());
+
+        // Pour afficher le temps en millisecondes
+        long temps = chrono.getTempsEcoule();
+
         if (this.modelePendu.gagne()){
             this.popUpMessageGagne().showAndWait();
             this.modeAccueil();

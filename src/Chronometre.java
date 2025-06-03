@@ -24,6 +24,8 @@ public class Chronometre extends Text{
      */
     private ControleurChronometre actionTemps;
 
+    private long tempsEcoule = 0;
+
     /**
      * Constructeur permettant de créer le chronomètre
      * avec un label initialisé à "0:0:0"
@@ -37,12 +39,17 @@ public class Chronometre extends Text{
         // A implémenter
     }
 
+    public long getTempsEcoule() {
+        return this.tempsEcoule;
+    }
+
     /**
      * Permet au controleur de mettre à jour le text
      * la durée est affichée sous la forme m:s
      * @param tempsMillisec la durée depuis à afficher
      */
     public void setTime(long tempsMillisec){
+        this.tempsEcoule = tempsMillisec;
         long secondes = tempsMillisec / 1000;
         long minutes = secondes / 60;
         secondes = secondes % 60;
