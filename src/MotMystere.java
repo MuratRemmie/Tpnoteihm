@@ -98,33 +98,43 @@ public class MotMystere {
         this.lettresEssayees = new HashSet<>();
 
         nbLettresRestantes=0;
-        
-        if (niveau == MotMystere.EXPERT || niveau == MotMystere.DIFFICILE){
-            motCrypte = "*"; // premiere lettre cachée
-            this.nbLettresRestantes+=1;
-        }
-        else{
-            motCrypte += this.motATrouver.charAt(0); // premiere lettre révélée
-        }
-        
-        for (int i=1; i<motATrouver.length()-1; i++){
-            char lettre = this.motATrouver.charAt(i);
-            if (this.niveau == MotMystere.EXPERT || Character.isAlphabetic(lettre)){
-                motCrypte += "*"; // lettre cachée
-                this.nbLettresRestantes += 1;
-            }   
-            else{
-                motCrypte += lettre; // lettre révélée si c'est un trait d'union ET qu'on n'est pas en mode Expert
-            }
-        }
-        
-        if (niveau != MotMystere.FACILE){ // dernière lettre révélée
+        int len = motATrouver.length();
+        // Première lettre
+        if (niveau == MotMystere.FACILE || niveau == MotMystere.MOYEN) {
+            motCrypte += this.motATrouver.charAt(0); // révélée
+        } else {
             motCrypte += "*";
             this.nbLettresRestantes += 1;
         }
-        else{
-            motCrypte += this.motATrouver.charAt(motATrouver.length()-1);
-            // dernière lettre cachée
+        // Lettres du milieu
+        for (int i=1; i<len-1; i++){
+            char lettre = this.motATrouver.charAt(i);
+            if (niveau == MotMystere.EXPERT) {
+                motCrypte += "*";
+                this.nbLettresRestantes += 1;
+            } else if (niveau == MotMystere.DIFFICILE) {
+                if (Character.isAlphabetic(lettre)) {
+                    motCrypte += "*";
+                    this.nbLettresRestantes += 1;
+                } else {
+                    motCrypte += lettre; // révèle les traits d'union
+                }
+            } else {
+                // FACILE ou MOYEN
+                if (Character.isAlphabetic(lettre)) {
+                    motCrypte += "*";
+                    this.nbLettresRestantes += 1;
+                } else {
+                    motCrypte += lettre;
+                }
+            }
+        }
+        // Dernière lettre
+        if (niveau == MotMystere.FACILE) {
+            motCrypte += this.motATrouver.charAt(len-1); // révélée
+        } else {
+            motCrypte += "*";
+            this.nbLettresRestantes += 1;
         }
         this.nbErreursMax = nbErreursMax;
         this.nbErreursRestantes = nbErreursMax;
