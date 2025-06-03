@@ -18,9 +18,9 @@ public class MonExecutable{
         }
 
         if (m.gagne()) {
-            System.out.println("Bravo !!! tu as gagné  le mot : " + m.getMotATrouve());
+            System.out.println("Bravo !!! tu as gagné  le mot : " + m.getMotATrouver());
         } else {
-            System.out.println("Perdu ! Le mot était : " + m.getMotATrouve());
+            System.out.println("Perdu ! Le mot était : " + m.getMotATrouver());
         }
         scanner.close();
 

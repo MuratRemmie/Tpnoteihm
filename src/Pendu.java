@@ -190,7 +190,7 @@ public class Pendu extends Application {
      // * @return la fenêtre d'accueil sur laquelle on peut choisir les paramètres de jeu
      // */
      private BorderPane fenetreAccueil(){
-            HBox head = new HBox();
+        HBox head = new HBox();
         head.setStyle("-fx-background-color:#B784A7; -fx-padding: 10px;");
         Label jeu = new Label();
         jeu.setText("Jeu du pendu ");
@@ -222,11 +222,11 @@ public class Pendu extends Application {
 
         this.groupeNiveaux = niv;
 
-
         VBox root = new VBox();
         root.getChildren().addAll(bJouer, facile, moyen, difficile, expert);
        
         BorderPane pane = new BorderPane();
+        // Ne pas ajouter de pane.setTop(head);
         pane.setCenter(root);
         return pane;
        
@@ -309,8 +309,8 @@ public class Pendu extends Application {
         // Pour afficher le temps en millisecondes
         long temps = chrono.getTempsEcoule();
 
-        // Afficher les popups seulement si une partie est en cours
-        if (this.modelePendu.partieEnCours()) {
+        // Afficher les popups de victoire/défaite si la partie vient de se terminer
+        if (!this.modelePendu.partieEnCours()) {
             if (this.modelePendu.gagne()){
                 this.popUpMessageGagne().showAndWait();
                 this.modeAccueil();
