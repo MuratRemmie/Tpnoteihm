@@ -95,32 +95,42 @@ public class MotMystere {
         this.lettresEssayees = new HashSet<>();
         this.nbLettresRestantes = 0;
         this.nbEerreursMax = nbErreursMax;
-        this.nbErreursRestantes = nbErreursMax; // <-- bien réinitialisé ici
+        this.nbErreursRestantes = nbErreursMax;
 
-        this.motCrypte = "";
+        if (motATrouver.length() < 2) {
+            throw new IllegalArgumentException("Le mot à trouver doit faire au moins 2 lettres");
+        }
+
+        // Première lettre
         if (niveau == MotMystere.EXPERT || niveau == MotMystere.DIFFICILE){
-            motCrypte = "*";
-            this.nbLettresRestantes+=1;
+            motCrypte += "*";
+            this.nbLettresRestantes += 1;
         } else {
             motCrypte += this.motATrouver.charAt(0);
         }
+
+        // Lettres du milieu
         for (int i=1; i<motATrouver.length()-1; i++){
             char lettre = this.motATrouver.charAt(i);
-            if (this.niveau == MotMystere.EXPERT || Character.isAlphabetic(lettre)){
+            if (niveau == MotMystere.EXPERT
+                || niveau == MotMystere.DIFFICILE
+                || (niveau == MotMystere.MOYEN && Character.isAlphabetic(lettre))) {
                 motCrypte += "*";
                 this.nbLettresRestantes += 1;
             } else {
                 motCrypte += lettre;
             }
         }
+
+        // Dernière lettre
         if (niveau != MotMystere.FACILE){
             motCrypte += "*";
             this.nbLettresRestantes += 1;
         } else {
             motCrypte += this.motATrouver.charAt(motATrouver.length()-1);
         }
-        this.nbEerreursMax = nbErreursMax;
-         this.nbErreursRestantes = nbErreursMax;
+
+        System.out.println("motCrypte=" + motCrypte + " nbLettresRestantes=" + nbLettresRestantes + " nbErreursRestantes=" + nbErreursRestantes);
     }
 
     /**
