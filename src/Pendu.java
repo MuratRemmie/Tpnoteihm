@@ -49,10 +49,6 @@ public class Pendu extends Application {
      */
     private Clavier clavier;
     /**
-     * le text qui indique le niveau de difficulté
-     */
-    private Text leNiveau;
-    /**
      * le chronomètre qui sera géré par une clasee à implémenter
      */
     private Chronometre chrono;
@@ -66,7 +62,6 @@ public class Pendu extends Application {
     private Button bJouer;
     private  BorderPane fenetrePrincipale ; 
     private ToggleGroup groupeNiveaux;
-    private Label labelTemps;
 
     /**
      * le bouton Paramètre / Engrenage
@@ -148,11 +143,10 @@ public class Pendu extends Application {
     // /**
     // * @return le panel du chronomètre
     // */
-     private TitledPane leChrono(){
-        // A implementer
-         TitledPane res = new TitledPane();
-         
-         return res;
+    private TitledPane leChrono(){
+        TitledPane res = new TitledPane("Chronomètre", this.chrono);
+        res.setCollapsible(false);
+        return res;
      }
 
     // /**
@@ -164,29 +158,45 @@ public class Pendu extends Application {
 
          this.motCrypte = new Text("Mot à trouver : ");
          motCrypte.setText(this.modelePendu.getMotCrypte());
+         motCrypte.setStyle("-fx-font-size: 32px; -fx-font-weight: bold;");
 
          VBox centre = new VBox();
          this.dessin = new ImageView(this.lesImages.get(0));
+         this.dessin.setFitHeight(250); // agrandir l'image du pendu
+         this.dessin.setPreserveRatio(true);
          this.pg = new ProgressBar(0.0);
+         this.pg.setPrefWidth(300);
+         centre.setAlignment(javafx.geometry.Pos.CENTER);
+         centre.setSpacing(20);
          centre.getChildren().addAll(this.dessin, this.pg);
 
-         this.labelTemps = new Label("Temps : 0:00");
          VBox aDroite = new VBox();
          int valniv = this.modelePendu.getNiveau();
          String niv = this.niveaux.get(valniv);
-         this.leNiveau = new Text(niv);
+         // Afficher le niveau choisi, non modifiable
+         Label niveauLabel = new Label("Niveau " + niv);
+         niveauLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-padding: 0 0 10 0;");
 
          TitledPane chrono = this.leChrono();
          Button nvmot = new Button("Nouveau mot");
-         aDroite.getChildren().addAll(leNiveau, chrono, labelTemps, nvmot);
+         nvmot.setStyle("-fx-font-size: 18px; -fx-padding: 10 20 10 20;");
+         aDroite.setSpacing(20);
+         
+         // On retire labelTemps ici
+         aDroite.getChildren().setAll(niveauLabel, chrono, nvmot);
+         aDroite.setAlignment(javafx.geometry.Pos.CENTER);
 
          VBox bas = new VBox();
          this.clavier = new Clavier("ABCDEFGHIJKLMNOPQRSTUVWXYZ", new ControleurLettres(this.modelePendu, this));
+         this.clavier.setStyle("-fx-font-size: 22px; -fx-spacing: 10px; -fx-padding: 20 0 20 0;");
          bas.getChildren().add(this.clavier);
+         bas.setAlignment(javafx.geometry.Pos.CENTER);
+         bas.setStyle("-fx-padding: 20 0 0 0;");
 
          // Ajoute le mot crypté au-dessus du centre
          VBox centreAvecMot = new VBox();
-         centreAvecMot.setSpacing(10);
+         centreAvecMot.setSpacing(20);
+         centreAvecMot.setAlignment(javafx.geometry.Pos.CENTER);
          centreAvecMot.getChildren().addAll(this.motCrypte, centre);
 
          mid.setRight(aDroite);
@@ -264,9 +274,11 @@ public class Pendu extends Application {
     public void modeJeu(){
         this.panelCentral = this.fenetreJeu();
         this.fenetrePrincipale.setCenter(this.panelCentral);
-        // Réactive le bouton maison quand on est en jeu
         this.boutonMaison.setDisable(false);
         reappliquerMainFont();
+        this.chrono.resetTime();
+        this.chrono.start();
+        if (this.chronoLabel != null) this.chronoLabel.setText(this.chrono.getText());
     }
     
     // Affiche la fenêtre des paramètres
@@ -361,16 +373,19 @@ public class Pendu extends Application {
         double progression = (double) nombreErreursRealiser / nombreErreursMaximum ;
         this.pg.setProgress(progression);
 
-        this.leNiveau.setText(this.niveaux.get(this.modelePendu.getNiveau()));
-
         this.clavier.majAffichage(this.modelePendu.getLettresEssayees());
         this.chrono.setTime(this.chrono.getTempsEcoule());
 
+        // Mise à jour du label du chrono
+        // if (this.chronoLabel != null) {
+        //     this.chronoLabel.setText(this.chrono.getText());
+        // }
         // Pour afficher le temps en texte
-        labelTemps.setText("Temps : " + chrono.getText());
+        // labelTemps.setText("Temps : " + chrono.getText());
 
         // Afficher les popups de victoire/défaite si la partie vient de se terminer
         if (!this.modelePendu.partieEnCours()) {
+            this.chrono.stop();
             if (this.modelePendu.gagne()){
                 this.popUpMessageGagne().showAndWait();
                 this.modeAccueil();
@@ -472,14 +487,14 @@ public void retourAccueil() {
         if (this.motCrypte != null) {
             this.motCrypte.setStyle("-fx-font-size: 24px; -fx-font-family: '" + fontFamily + "';");
         }
-        // Appliquer la police sur le label du niveau
-        if (this.leNiveau != null) {
-            this.leNiveau.setStyle("-fx-font-size: 18px; -fx-font-family: '" + fontFamily + "';");
-        }
+        // SUPPRIMÉ : plus de label leNiveau à styliser
+        // if (this.leNiveau != null) {
+        //     this.leNiveau.setStyle("-fx-font-size: 18px; -fx-font-family: '" + fontFamily + "';");
+        // }
         // Appliquer la police sur le label du temps
-        if (this.labelTemps != null) {
-            this.labelTemps.setStyle("-fx-font-size: 16px; -fx-font-family: '" + fontFamily + "';");
-        }
+        // if (this.labelTemps != null) {
+        //     this.labelTemps.setStyle("-fx-font-size: 16px; -fx-font-family: '" + fontFamily + "';");
+        // }
         // Stocker la police pour la réappliquer lors des changements d'écran
         this.mainFontFamily = fontFamily;
     }
@@ -493,4 +508,7 @@ public void retourAccueil() {
 
     // Ajout d'un champ pour stocker la police principale
     private String mainFontFamily = null;
+
+    // Chronomètre fonctionnel
+    private Label chronoLabel = null; // Affichage du chrono
 }
