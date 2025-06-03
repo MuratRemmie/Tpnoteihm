@@ -117,14 +117,16 @@ public class Pendu extends Application {
         borderPane.setLeft(jeu);
 
         // (Ré)initialisation des boutons pour éviter les problèmes d'affichage
+        // Boutons à droite
         this.boutonMaison = new Button();
         this.boutonMaison.setGraphic(new ImageView(new Image("file:img/home.png", 32, 32, true, true)));
         this.boutonMaison.setStyle("-fx-background-color: white; -fx-border-radius: 5; -fx-background-radius: 5;");
-        this.boutonMaison.setOnAction(e -> this.modeAccueil());
+        this.boutonMaison.setOnAction(new RetourAccueil(this.modelePendu, this));
 
         this.boutonParametres = new Button();
         this.boutonParametres.setGraphic(new ImageView(new Image("file:img/parametres.png", 32, 32, true, true)));
         this.boutonParametres.setStyle("-fx-background-color: white; -fx-border-radius: 5; -fx-background-radius: 5;");
+        // TODO: Ajouter un vrai controleur pour les paramètres si besoin
         this.boutonParametres.setOnAction(e -> this.modeParametres());
 
         Button info = new Button();
@@ -134,6 +136,7 @@ public class Pendu extends Application {
         infoView.setFitWidth(32);
         info.setGraphic(infoView);
         info.setStyle("-fx-background-color: white; -fx-border-radius: 5; -fx-background-radius: 5;");
+        info.setOnAction(new ControleurInfos(this));
 
         HBox boutons = new HBox(10, this.boutonMaison, this.boutonParametres, info);
         boutons.setStyle("-fx-alignment: center-right;");
