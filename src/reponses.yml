@@ -1,0 +1,11 @@
+1.1
+Le modèle est composé de MotMystere et Dictionnaire.
+La vue est composée de Pendu, Clavier et Chronometre.
+Les contrôleurs sont : ControleurLettres, ControleurParametres, ControleurChronometre, ControleurInfos, ControleurNiveau, ControleurLancerPartie.
+
+1.2
+MotMystere utilise Dictionnaire.
+Pendu utilise Clavier et Chronometre.
+Les contrôleurs référencent le modèle et/ou la vue selon leur fonction.
+Tous les contrôleurs héritent de EventHandler<ActionEvent>.
+Les associations sont donc principalement du contrôleur vers le modèle et la vue, et du modèle vers le dictionnaire.
