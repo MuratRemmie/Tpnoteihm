@@ -47,7 +47,7 @@ public class MotMystere {
     /**
      * le nombre total de tentatives autorisées
      */
-    private int nbEerreursMax;
+    private int nbErreursMax;
     /**
      * dictionnaire dans lequel on choisit les mots
      */
@@ -94,7 +94,7 @@ public class MotMystere {
         this.motCrypte = "";
         this.lettresEssayees = new HashSet<>();
         this.nbLettresRestantes = 0;
-        this.nbEerreursMax = nbErreursMax;
+        this.nbErreursMax = nbErreursMax;
         this.nbErreursRestantes = nbErreursMax;
 
         if (motATrouver.length() < 2) {
@@ -112,7 +112,10 @@ public class MotMystere {
         // Lettres du milieu
         for (int i=1; i<motATrouver.length()-1; i++){
             char lettre = this.motATrouver.charAt(i);
-            if (niveau == MotMystere.EXPERT
+            if (niveau == MotMystere.FACILE) {
+                motCrypte += "*";
+                this.nbLettresRestantes += 1;
+            } else if (niveau == MotMystere.EXPERT
                 || niveau == MotMystere.DIFFICILE
                 || (niveau == MotMystere.MOYEN && Character.isAlphabetic(lettre))) {
                 motCrypte += "*";
@@ -151,7 +154,7 @@ public class MotMystere {
      * @param motATrouver le nouveau mot à trouver
      */
     public void setMotATrouver(String motATrouver) {
-        this.initMotMystere(motATrouver, this.niveau, this.nbEerreursMax);
+        this.initMotMystere(motATrouver, this.niveau, this.nbErreursMax);
         this.partieDemarree = true;
     }
 
@@ -159,7 +162,7 @@ public class MotMystere {
      * Réinitialise le jeu avec un nouveau mot à trouver choisi au hasard dans le dictionnaire
      */
     public void setMotATrouver() {
-        this.initMotMystere(this.dict.choisirMot(), this.niveau, this.nbEerreursMax);
+        this.initMotMystere(this.dict.choisirMot(), this.niveau, this.nbErreursMax);
         this.partieDemarree = true;
     }
 
@@ -203,7 +206,7 @@ public class MotMystere {
      * @return le nombre total de tentatives autorisées
      */
     public int getNbErreursMax(){
-        return this.nbEerreursMax;
+        return this.nbErreursMax;
     }
 
     /**
@@ -262,13 +265,11 @@ public class MotMystere {
             && !perdu();
     }
 
-    /**
-     * @return une chaine de caractère donnant l'état du jeu
-     */
-    public String toString(){
-        return "Mot a trouve: "+this.motATrouver+" Lettres trouvees: "+
-               this.motCrypte+" nombre de lettres restantes "+this.nbLettresRestantes+
-               " nombre d'essais restents: "+this.nbErreursRestantes;
+    @Override
+    public String toString() {
+        return "Mot a trouver: " + this.motATrouver +
+               " Lettres trouvees: " + this.motCrypte +
+               " nombre de lettres restantes: " + this.nbLettresRestantes +
+               " nombre d'essais restants: " + this.nbErreursRestantes;
     }
-
 }
