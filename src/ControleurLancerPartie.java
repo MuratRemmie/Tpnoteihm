@@ -1,7 +1,5 @@
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.scene.control.ButtonType;
-import java.util.Optional;
 
 /**
  * Contrôleur à activer lorsque l'on clique sur le bouton rejouer ou Lancer une partie
@@ -32,18 +30,9 @@ public class ControleurLancerPartie implements EventHandler<ActionEvent> {
      */
     @Override
     public void handle(ActionEvent actionEvent) {
-        if (this.modelePendu.partieEnCours()) {
-            Optional<ButtonType> reponse = this.vuePendu.popUpPartieEnCours().showAndWait();
-            if (reponse.isPresent() && reponse.get().equals(ButtonType.YES)) {
-                System.out.println("Ok ! Recommencer une partie");
-                this.vuePendu.lancePartie();
-            } else {
-                System.out.println("Annulation du relancement de la partie");
-            }
-        } else {
-            System.out.println("Aucune partie en cours, lancement direct");
-            this.vuePendu.lancePartie();
-        }
+        // On lance toujours une nouvelle partie sans confirmation
+        System.out.println("Lancement d'une nouvelle partie");
+        this.vuePendu.lancePartie();
     }
 }
 
