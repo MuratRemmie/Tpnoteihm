@@ -33,10 +33,13 @@ public class Chronometre extends Text{
      */
     public Chronometre(){
         this.timeline = new Timeline();
-        this.keyFrame = new KeyFrame(Duration.millis(1000), actionTemps);
-        this.keyFrame = new KeyFrame(Duration.seconds(1), this.actionTemps);
         this.actionTemps = new ControleurChronometre(this);
-        // A implémenter
+        this.keyFrame = new KeyFrame(Duration.seconds(1), this.actionTemps);
+        this.timeline.getKeyFrames().add(this.keyFrame);
+        this.timeline.setCycleCount(Animation.INDEFINITE);
+        this.setText("0:00");
+        this.setFont(Font.font(24));
+        this.setTextAlignment(TextAlignment.CENTER);
     }
 
     public long getTempsEcoule() {
@@ -83,6 +86,9 @@ public class Chronometre extends Text{
      */
     public void resetTime(){
         this.stop();
+        if (this.actionTemps != null) {
+            this.actionTemps.reset();
+        }
         this.setTime(0);
     }
 }

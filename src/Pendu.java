@@ -434,6 +434,7 @@ public class Pendu extends Application {
         this.modelePendu.setNiveau(niveau);
         this.modelePendu.setMotATrouver();
         this.chrono.resetTime();
+        this.chrono.start();
         this.modeJeu();
         this.majAffichage();
     }
@@ -461,6 +462,7 @@ public class Pendu extends Application {
         this.modelePendu.setNiveau(niveau);
         this.modelePendu.setMotATrouver();
         this.chrono.resetTime();
+        this.chrono.start();
         this.modeJeu();
         this.majAffichage();
     }
