@@ -346,8 +346,15 @@ public class Pendu extends Application {
     }
         
     public Alert popUpReglesDuJeu(){
-        // A implenter
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Règles du jeu du Pendu");
+        alert.setHeaderText("Comment jouer ?");
+        alert.setContentText("Le but du jeu est de deviner un mot en proposant des lettres.\n" +
+            "À chaque mauvaise lettre, une partie du pendu est dessinée.\n" +
+            "Vous gagnez si vous trouvez toutes les lettres avant que le pendu ne soit complet !\n\n" +
+            "- Cliquez sur les lettres pour proposer une lettre.\n" +
+            "- Le nombre d'erreurs autorisées dépend du niveau.\n" +
+            "- Bonne chance !");
         return alert;
     }
     
