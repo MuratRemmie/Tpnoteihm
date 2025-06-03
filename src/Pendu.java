@@ -289,7 +289,6 @@ public class Pendu extends Application {
      * raffraichit l'affichage selon les données du modèle
      */
     public void majAffichage(){
-        
         this.motCrypte.setText(this.modelePendu.getMotCrypte());
         int nombreErreursRealiser = this.modelePendu.getNbErreursMax()  - this.modelePendu.getNbErreursRestants();
         int imageIndex = Math.min(nombreErreursRealiser, this.lesImages.size() - 1);
@@ -310,16 +309,16 @@ public class Pendu extends Application {
         // Pour afficher le temps en millisecondes
         long temps = chrono.getTempsEcoule();
 
-        if (this.modelePendu.gagne()){
-            this.popUpMessageGagne().showAndWait();
-            this.modeAccueil();
-        } else if (this.modelePendu.perdu()){
-            this.popUpMessagePerdu().showAndWait();
-            this.modeAccueil();
-            
+        // Afficher les popups seulement si une partie est en cours
+        if (this.modelePendu.partieEnCours()) {
+            if (this.modelePendu.gagne()){
+                this.popUpMessageGagne().showAndWait();
+                this.modeAccueil();
+            } else if (this.modelePendu.perdu()){
+                this.popUpMessagePerdu().showAndWait();
+                this.modeAccueil();
+            }
         }
-
-        
     }
 
     /**
