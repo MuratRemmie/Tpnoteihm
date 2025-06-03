@@ -79,6 +79,7 @@ public class MotMystere {
         super();
         this.dict = new Dictionnaire(nomFichier,longMin,longMax);
         this.partieDemarree = false;
+        this.nbErreursMax = nbErreursMax; // Correction : stocker le nombre d'erreurs max pour la première partie
         // Partie non démarrée ici, elle sera démarrée explicitement par setMotATrouver() dans lancePartie()
     }
 

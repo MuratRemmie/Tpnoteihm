@@ -1,6 +1,5 @@
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 
 
@@ -42,22 +41,6 @@ public class ControleurLettres implements EventHandler<ActionEvent> {
         bouton.setDisable(true);
         // Met à jour l'affichage (mot, pendu, progression, clavier)
         this.vuePendu.majAffichage();
-        
-        if(modelePendu.gagne()){
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Partie gagnée");
-            alert.setHeaderText("Bravo !");
-            alert.setContentText("Tu as gagné, félicitations !");
-            alert.showAndWait();
-        }else{
-            if(modelePendu.perdu()){
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setTitle("Partie perdue");
-                alert.setHeaderText("Dommage !");
-                alert.setContentText("Tu as perdu, le mot était: " + modelePendu.getMotATrouver());
-                alert.showAndWait();
-            }
-        }
-        
+        // La gestion de la victoire/défaite et popup est faite dans majAffichage() de Pendu.java
     }
 }
